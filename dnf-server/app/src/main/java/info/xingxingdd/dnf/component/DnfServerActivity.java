@@ -1,0 +1,54 @@
+package info.xingxingdd.dnf.component;
+
+import android.content.Intent;
+import android.os.Build;
+import android.os.Bundle;
+
+import androidx.activity.ComponentActivity;
+import androidx.annotation.Nullable;
+
+public class DnfServerActivity extends ComponentActivity {
+
+    @Override
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(new Intent(this, DnfServerService.class));
+        }
+//        YoloV5Ncnn yoloV5Ncnn = new YoloV5Ncnn();
+//        boolean result = yoloV5Ncnn.Init(getAssets());
+//        AssetManager assetManager = getAssets();
+//
+//        // 打开 assets 目录下的图片文件
+//        InputStream inputStream = null;
+//        try {
+//            inputStream = assetManager.open("frame_000057.jpg");
+//            // 将输入流解码为 Bitmap
+//            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+//
+//            // 关闭输入流
+//            inputStream.close();
+//            YoloV5Ncnn.Obj[] results = yoloV5Ncnn.Detect(bitmap, false);
+//            String labels = Arrays.stream(results).map(r -> r.label).collect(Collectors.joining(","));
+//            if (!result) {
+//                Toast.makeText(this, "注册失败", Toast.LENGTH_LONG).show();
+//            } else {
+//                Toast.makeText(this, "注册完成:" + labels, Toast.LENGTH_LONG).show();
+//            }
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+}
