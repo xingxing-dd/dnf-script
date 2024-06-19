@@ -1,23 +1,23 @@
-package info.xingxingdd.dnf.client;
+package info.xingxingdd.dnf.connection;
 
 import com.google.gson.Gson;
 
 import org.java_websocket.WebSocket;
 
-public class ClientConnectHolder {
+public class ConnectionHolder {
 
     /**
      * 只能允许有一个实例
      */
-    private static ClientConnectHolder instance;
+    private static ConnectionHolder instance;
 
     private WebSocket connection;
 
-    private ClientConnectHolder() {}
+    private ConnectionHolder() {}
 
-    public static ClientConnectHolder getInstance() {
+    public static ConnectionHolder getInstance() {
         if (instance == null) {
-            instance = new ClientConnectHolder();
+            instance = new ConnectionHolder();
         }
         return instance;
     }

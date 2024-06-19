@@ -43,4 +43,5 @@ public class Output {
     public void setData(Map<String, Object> data) {
         this.data = data;
     }
+
 }
