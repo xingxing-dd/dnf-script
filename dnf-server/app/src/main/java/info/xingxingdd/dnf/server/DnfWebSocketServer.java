@@ -1,9 +1,11 @@
-package info.xingxingdd.dnf.connection;
+package info.xingxingdd.dnf.server;
 
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
 
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
@@ -11,9 +13,15 @@ import org.java_websocket.server.WebSocketServer;
 
 import java.net.InetSocketAddress;
 
-import info.xingxingdd.dnf.connection.client.ClientConnectHolder;
+import info.xingxingdd.dnf.client.ClientConnectHolder;
+import info.xingxingdd.dnf.executor.MessageExecutor;
+import info.xingxingdd.dnf.executor.MessageExecutorFactory;
+import info.xingxingdd.dnf.message.Input;
+import info.xingxingdd.dnf.message.Output;
 
 public class DnfWebSocketServer extends WebSocketServer {
+
+    private final Gson gson = new Gson();
 
     private final Handler mainHandler = new Handler(Looper.getMainLooper());
 
@@ -43,7 +51,13 @@ public class DnfWebSocketServer extends WebSocketServer {
         if (message == null || message.isEmpty()) {
             return;
         }
-
+        Input input = gson.fromJson(message, Input.class);
+        MessageExecutor messageExecutor = MessageExecutorFactory.acquire(input.getAction());
+        Output output = messageExecutor.process(input, context);
+        if (output == null) {
+            return;
+        }
+        conn.send(gson.toJson(output));
     }
 
     @Override

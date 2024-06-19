@@ -19,10 +19,10 @@ import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import info.xingxingdd.dnf.connection.DnfWebSocketServer;
+import info.xingxingdd.dnf.server.DnfWebSocketServer;
 import info.xingxingdd.dnf.R;
 
-public class DnfServerService extends Service {
+public class   DnfServerService extends Service {
     private static final int SERVICE_NOTIFICATION_ID = 1;
     private static final String CHANNEL_ID = "DNF-SERVER";
 
@@ -46,7 +46,7 @@ public class DnfServerService extends Service {
             //启动websocket
             this.startForegroundWebsocket();
         } catch (Exception e) {
-            Toast.makeText(this, "打开ws失败:" + Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.joining(",")), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "打开服务失败:" + Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.joining(",")), Toast.LENGTH_LONG).show();
         }
     }
 
@@ -72,6 +72,7 @@ public class DnfServerService extends Service {
         dnfWebSocketServer = new DnfWebSocketServer(this, inetSocketAddress);
         dnfWebSocketServer.start();
     }
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {

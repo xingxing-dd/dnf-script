@@ -1,4 +1,4 @@
-package info.xingxingdd.dnf.connection.message;
+package info.xingxingdd.dnf.message;
 
 import java.util.Map;
 

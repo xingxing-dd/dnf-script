@@ -1,4 +1,4 @@
-package info.xingxingdd.dnf.connection.client;
+package info.xingxingdd.dnf.client;
 
 import com.google.gson.Gson;
 
