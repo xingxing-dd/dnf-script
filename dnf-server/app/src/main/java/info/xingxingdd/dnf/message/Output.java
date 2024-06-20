@@ -44,4 +44,12 @@ public class Output {
         this.data = data;
     }
 
+
+    public static Output success() {
+        Output output = new Output();
+        output.setStatus("success");
+        output.setDesc("操作成功");
+        return output;
+    }
+
 }

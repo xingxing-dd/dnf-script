@@ -1,6 +1,8 @@
 package info.xingxingdd.dnf.component;
 
+import android.content.Context;
 import android.content.Intent;
+import android.media.projection.MediaProjectionManager;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -39,6 +41,12 @@ public class DnfServerActivity extends ComponentActivity {
 //            throw new RuntimeException(e);
 //        }
 
+    }
+
+    private void startRequest() {
+        MediaProjectionManager projectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
+        // 发起屏幕捕获意图
+        startActivity(projectionManager.createScreenCaptureIntent());
     }
 
     @Override
