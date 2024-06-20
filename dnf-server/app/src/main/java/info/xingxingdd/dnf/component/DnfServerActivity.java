@@ -7,6 +7,10 @@ import android.os.Build;
 import android.os.Bundle;
 
 import androidx.activity.ComponentActivity;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 
 public class DnfServerActivity extends ComponentActivity {
@@ -17,6 +21,7 @@ public class DnfServerActivity extends ComponentActivity {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             startForegroundService(new Intent(this, DnfServerService.class));
         }
+        startScreenCaptureRequest();
 //        YoloV5Ncnn yoloV5Ncnn = new YoloV5Ncnn();
 //        boolean result = yoloV5Ncnn.Init(getAssets());
 //        AssetManager assetManager = getAssets();
@@ -43,10 +48,21 @@ public class DnfServerActivity extends ComponentActivity {
 
     }
 
-    private void startRequest() {
+    private void startScreenCaptureRequest() {
         MediaProjectionManager projectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
         // 发起屏幕捕获意图
-        startActivity(projectionManager.createScreenCaptureIntent());
+        ActivityResultLauncher<Intent> startActivityForResult = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == RESULT_OK) {
+                        // 处理返回的结果
+                        // 例如，从返回的 Intent 中获取数据
+                        Intent data = result.getData();
+                        // ...
+                    }
+                }
+        );
+        startActivityForResult.launch(projectionManager.createScreenCaptureIntent());
     }
 
     @Override
