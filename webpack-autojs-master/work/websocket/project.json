@@ -1,0 +1,10 @@
+{
+    "name": "websocket",
+    "main": "main.js",
+    "ignore": [
+        "build"
+    ],
+    "packageName": "com.example.websocket",
+    "versionName": "1.7.0",
+    "versionCode": 17
+}

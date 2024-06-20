@@ -1,0 +1,10 @@
+{
+    "name": "云控demo",
+    "main": "main.js",
+    "ignore": [
+        "build"
+    ],
+    "packageName": "com.example.demo",
+    "versionName": "1.7.0",
+    "versionCode": 17
+}

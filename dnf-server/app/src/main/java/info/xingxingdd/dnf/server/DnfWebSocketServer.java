@@ -13,7 +13,7 @@ import org.java_websocket.server.WebSocketServer;
 
 import java.net.InetSocketAddress;
 
-import info.xingxingdd.dnf.client.ClientConnectHolder;
+import info.xingxingdd.dnf.connection.ConnectionHolder;
 import info.xingxingdd.dnf.executor.MessageExecutor;
 import info.xingxingdd.dnf.executor.MessageExecutorFactory;
 import info.xingxingdd.dnf.message.Input;
@@ -27,7 +27,7 @@ public class DnfWebSocketServer extends WebSocketServer {
 
     private final Context context;
 
-    private final ClientConnectHolder connectHolder = ClientConnectHolder.getInstance();
+    private final ConnectionHolder connectHolder = ConnectionHolder.getInstance();
 
     public DnfWebSocketServer(Context context, InetSocketAddress inetSocketAddress) {
         super(inetSocketAddress);
