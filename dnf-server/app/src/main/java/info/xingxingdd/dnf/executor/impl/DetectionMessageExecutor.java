@@ -14,6 +14,7 @@ public class DetectionMessageExecutor extends AbstractMessageExecutor {
 
     @Override
     public Output process(Input input, Context context) {
+        MediaProjectionManager projectionManager = (MediaProjectionManager) context.getSystemService(Context.MEDIA_PROJECTION_SERVICE);
         return Output.success();
     }
 
