@@ -1,13 +1,10 @@
 "ui";
 var utils = require("./common/utils")
-var server = require("./common/socket")
-var storage = storages.create("info.xingxingdd.dnf");
+//加载主页
 utils.async(
     () => utils.loadView("loading"),
-    () => {
-        utils.startServer()
-        sleep(2000)
-        server.connect()
-    },
-    () => utils.loadView("home")
+    utils.startServer,
+    () => utils.loadView("home", true),
+    1000
 )
+

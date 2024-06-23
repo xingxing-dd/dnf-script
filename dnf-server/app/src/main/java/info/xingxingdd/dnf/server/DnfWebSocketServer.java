@@ -3,6 +3,7 @@ package info.xingxingdd.dnf.server;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -37,17 +38,20 @@ public class DnfWebSocketServer extends WebSocketServer {
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
         connectHolder.set(conn);
-        mainHandler.post(() -> Toast.makeText(context, "客户端连接成功", Toast.LENGTH_LONG).show());
+        //mainHandler.post(() -> Toast.makeText(context, "客户端连接成功", Toast.LENGTH_LONG).show());
+        Log.i("dnf-server", "客户端连接成功");
     }
 
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
         connectHolder.remove();
-        mainHandler.post(() -> Toast.makeText(context, "客户端连接断开", Toast.LENGTH_LONG).show());
+        //mainHandler.post(() -> Toast.makeText(context, "客户端连接断开", Toast.LENGTH_LONG).show());
+        Log.i("dnf-server", "客户端连接断开");
     }
 
     @Override
     public void onMessage(WebSocket conn, String message) {
+        Log.i("dnf-server", "接收到客户端:" + message);
         if (message == null || message.isEmpty()) {
             return;
         }

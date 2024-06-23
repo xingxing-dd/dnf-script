@@ -1,8 +1,10 @@
 package info.xingxingdd.dnf.component;
 
+import android.Manifest;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -17,6 +19,9 @@ import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import info.xingxingdd.dnf.DnfServerApplication;
 import info.xingxingdd.dnf.assistant.YoloV5Ncnn;
@@ -60,13 +65,16 @@ public class DnfServerActivity extends ComponentActivity implements ActivityResu
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     @Override
     protected void onStart() {
         super.onStart();
-//        DnfServerApplication application = (DnfServerApplication) getApplication();
-//        if (application.isForegroundServiceRunning()) {
-//            return;
-//        }
+        requestReadImagePermission();
+        DnfServerApplication application = (DnfServerApplication) getApplication();
+        if (application.isForegroundServiceRunning()) {
+            finishAffinity();
+            return;
+        }
         MediaProjectionManager projectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
         // 发起屏幕捕获意图
         ActivityResultLauncher<Intent> startActivityForResult = registerForActivityResult(
@@ -76,9 +84,19 @@ public class DnfServerActivity extends ComponentActivity implements ActivityResu
         startActivityForResult.launch(projectionManager.createScreenCaptureIntent());
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+    private void requestReadImagePermission() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
+                != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.READ_MEDIA_IMAGES},
+                    1001);
+        }
+    }
+
     @Override
     public void onActivityResult(ActivityResult result) {
-        finish();
         if (result.getResultCode() != RESULT_OK) {
             Toast.makeText(this, "未开启录屏权限，无法使用系统", Toast.LENGTH_LONG).show();
             return;
@@ -94,6 +112,7 @@ public class DnfServerActivity extends ComponentActivity implements ActivityResu
         startForegroundService(serviceIntent);
         //设置服务启动
         ((DnfServerApplication) getApplication()).setForegroundServiceRunning();
+        finishAffinity();
     }
 
 }

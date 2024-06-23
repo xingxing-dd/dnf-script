@@ -1,6 +1,12 @@
 var config = require("./config").config()
 exports.loadView = (view) => {
-    ui.setContentView(require("../view/" + view).view())
+    console.info("加载页面：" + view)
+    const module = require("../view/" + view)
+    ui.setContentView(module.view())
+    if (!module.action) {
+        return
+    }
+    module.action()
 }
 
 exports.downloadServer = () => {
@@ -30,6 +36,14 @@ exports.startServer = () => {
     return result
 }
 
-exports.connectServer = () => {
-
+exports.async = (before, task, after, delay) => {
+    threads.start(() => {
+        ui.post(before)
+        task()
+        console.info(delay)
+        if (delay) {
+            sleep(delay)
+        }
+        ui.post(after)
+    });
 }

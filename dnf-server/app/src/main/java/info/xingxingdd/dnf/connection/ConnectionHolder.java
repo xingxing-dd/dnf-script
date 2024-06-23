@@ -1,5 +1,7 @@
 package info.xingxingdd.dnf.connection;
 
+import android.util.Log;
+
 import com.google.gson.Gson;
 
 import org.java_websocket.WebSocket;
@@ -34,7 +36,9 @@ public class ConnectionHolder {
     }
 
     public void send(Object message) {
-        this.connection.send(new Gson().toJson(message));
+        String messageBody = new Gson().toJson(message);
+        Log.i("dnf-server", "发送消息:" + messageBody);
+        this.connection.send(messageBody);
     }
 
 }

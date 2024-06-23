@@ -9,7 +9,7 @@ import info.xingxingdd.dnf.message.Output;
 public class SettingMessageExecutor extends AbstractMessageExecutor {
 
     @Override
-    public Output process(Input input, Context context) {
+    public Output doProcess(Input input, Context context) {
         return new Output();
     }
 

@@ -52,4 +52,29 @@ public class Output {
         return output;
     }
 
+
+    public static Output success(Map<String, Object> data) {
+        Output output = new Output();
+        output.setStatus("success");
+        output.setDesc("操作成功");
+        output.setData(data);
+        return output;
+    }
+
+
+    public static Output failure(String desc) {
+        Output output = new Output();
+        output.setStatus("failure");
+        output.setDesc(desc);
+        return output;
+    }
+
+
+    public static Output pending() {
+        Output output = new Output();
+        output.setStatus("pending");
+        output.setDesc("操作待处理");
+        return output;
+    }
+
 }

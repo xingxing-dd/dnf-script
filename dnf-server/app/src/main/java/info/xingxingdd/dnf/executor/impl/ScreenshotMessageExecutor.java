@@ -1,35 +1,25 @@
 package info.xingxingdd.dnf.executor.impl;
 
-import static androidx.core.content.ContextCompat.getSystemService;
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.Image;
-import android.media.projection.MediaProjection;
-import android.media.projection.MediaProjectionManager;
 import android.os.Environment;
 import android.util.Log;
-
-import com.google.gson.Gson;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.Map;
 
 import info.xingxingdd.dnf.assistant.ScreenCapture;
-import info.xingxingdd.dnf.assistant.YoloV5Ncnn;
-import info.xingxingdd.dnf.connection.ConnectionHolder;
 import info.xingxingdd.dnf.executor.AbstractMessageExecutor;
 import info.xingxingdd.dnf.message.Input;
 import info.xingxingdd.dnf.message.Output;
 
-public class DetectionMessageExecutor extends AbstractMessageExecutor {
+public class ScreenshotMessageExecutor extends AbstractMessageExecutor {
 
     @Override
-    public Output doProcess(Input input, Context context) {
+    protected Output doProcess(Input input, Context context) {
         ScreenCapture.getInstance().setConsumer(image -> {
             Image.Plane[] planes = image.getPlanes();
             ByteBuffer buffer = planes[0].getBuffer();
@@ -42,21 +32,33 @@ public class DetectionMessageExecutor extends AbstractMessageExecutor {
             Bitmap bitmap = Bitmap.createBitmap(image.getWidth() + rowPadding / pixelStride, image.getHeight(), Bitmap.Config.ARGB_8888);
             buffer.rewind(); // 确保buffer的position是0
             bitmap.copyPixelsFromBuffer(buffer);
+
+            // 裁剪掉可能存在的填充部分
+            Bitmap croppedBitmap = Bitmap.createBitmap(bitmap, 0, 0, image.getWidth(), image.getHeight());
+
+            // 保存croppedBitmap到文件中
+            File directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);// 获取内部存储目录
+            File file = new File(directory, "screenshot_" + System.currentTimeMillis() + ".png");
+
+            FileOutputStream fos = null;
             try {
-                YoloV5Ncnn.Obj[] objs = YoloV5Ncnn.getInstance().Detect(bitmap, false);
-                Log.i("dnf-server", "Screen capture saved: ");
-                Map<String, Object> data = new HashMap<>();
-                data.put("objs", new Gson().toJson(objs));
-                Output output = Output.success(data);
-                output.setRequestId(input.getRequestId());
-                ConnectionHolder.getInstance().send(output);
-            } catch (Exception e) {
+                fos = new FileOutputStream(file);
+                croppedBitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                Log.i("dnf-server", "Screen capture saved: " + file.getAbsolutePath());
+            } catch (IOException e) {
                 Log.e("dnf-server", "Failed to save screen capture", e);
             } finally {
+                if (fos != null) {
+                    try {
+                        fos.close();
+                    } catch (IOException ioException) {
+                        Log.e("dnf-server", "Error closing FileOutputStream", ioException);
+                    }
+                }
                 bitmap.recycle();
             }
         });
-        return Output.pending();
+        return Output.success();
     }
 
 }

@@ -2,13 +2,14 @@ package info.xingxingdd.dnf.assistant;
 
 import android.media.Image;
 
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public class ScreenCapture {
 
     private static ScreenCapture instance;
 
-    private Function<Image, Void> func;
+    private Consumer<Image> consumer;
 
     public static ScreenCapture getInstance() {
         if (instance == null) {
@@ -17,12 +18,12 @@ public class ScreenCapture {
         return instance;
     }
 
-    public void setFunc(Function<Image, Void> func) {
-        this.func = func;
+    public void setConsumer(Consumer<Image> consumer) {
+        this.consumer = consumer;
     }
 
-    public Function<Image, Void> getFunc() {
-        return func;
+    public Consumer<Image> getConsumer() {
+        return consumer;
     }
 
 }

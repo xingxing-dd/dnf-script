@@ -19,6 +19,9 @@ import android.graphics.Bitmap;
 
 public class YoloV5Ncnn
 {
+
+    private static YoloV5Ncnn instance;
+
     public native boolean Init(AssetManager mgr);
 
     public class Obj
@@ -36,4 +39,17 @@ public class YoloV5Ncnn
     static {
         System.loadLibrary("yolov5ncnn");
     }
+
+    public static YoloV5Ncnn getInstance(AssetManager assetManager) {
+        if (instance == null) {
+            instance = new YoloV5Ncnn();
+            instance.Init(assetManager);
+        }
+        return instance;
+    }
+
+    public static YoloV5Ncnn getInstance() {
+        return instance;
+    }
+
 }

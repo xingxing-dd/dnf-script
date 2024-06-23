@@ -29,10 +29,12 @@ import androidx.core.app.NotificationCompat;
 
 import java.net.InetSocketAddress;
 import java.util.Arrays;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import info.xingxingdd.dnf.assistant.ScreenCapture;
+import info.xingxingdd.dnf.assistant.YoloV5Ncnn;
 import info.xingxingdd.dnf.server.DnfWebSocketServer;
 import info.xingxingdd.dnf.R;
 
@@ -103,21 +105,22 @@ public class   DnfServerService extends Service {
         ImageReader imageReader = ImageReader.newInstance(screenWidth, screenHeight, PixelFormat.RGBA_8888, 2);
 
         Handler handler = new Handler(Looper.getMainLooper());
-        imageReader.setOnImageAvailableListener(reader -> {
-            try (Image image = reader.acquireLatestImage()) {
-                Function<Image, Void> func = ScreenCapture.getInstance().getFunc();
-                if (func == null || image == null) {
-                    return;
-                }
-                func.apply(image);
-            }
-        }, handler);
         mediaProjection.createVirtualDisplay(
                 "ScreenCapture",
                 screenWidth, screenHeight, screenDensity,
                 DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
                 imageReader.getSurface(), null, handler
         );
+        imageReader.setOnImageAvailableListener(reader -> {
+            try (Image image = reader.acquireLatestImage()) {
+                Consumer<Image> consumer = ScreenCapture.getInstance().getConsumer();
+                if (consumer == null || image == null) {
+                    return;
+                }
+                consumer.accept(image);
+                ScreenCapture.getInstance().setConsumer(null);
+            }
+        }, handler);
     }
 
 
@@ -128,6 +131,8 @@ public class   DnfServerService extends Service {
             this.startForegroundWebsocket();
             //启动录屏服务
             this.startScreenCaptureService(intent);
+            //初始化模型
+            YoloV5Ncnn.getInstance(getAssets());
         } catch (Exception e) {
             Toast.makeText(this, "打开服务失败:" + Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.joining(",")), Toast.LENGTH_LONG).show();
         }
