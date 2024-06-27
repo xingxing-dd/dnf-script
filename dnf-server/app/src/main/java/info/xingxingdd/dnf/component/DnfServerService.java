@@ -1,25 +1,15 @@
 package info.xingxingdd.dnf.component;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.PixelFormat;
-import android.hardware.display.DisplayManager;
-import android.hardware.display.VirtualDisplay;
-import android.media.Image;
-import android.media.ImageReader;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Looper;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -29,13 +19,11 @@ import androidx.core.app.NotificationCompat;
 
 import java.net.InetSocketAddress;
 import java.util.Arrays;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import info.xingxingdd.dnf.assistant.ScreenCapture;
 import info.xingxingdd.dnf.assistant.YoloV5Ncnn;
-import info.xingxingdd.dnf.server.DnfWebSocketServer;
+import info.xingxingdd.dnf.server.DnfSocketServer;
 import info.xingxingdd.dnf.R;
 
 public class   DnfServerService extends Service {
@@ -44,7 +32,7 @@ public class   DnfServerService extends Service {
 
     private static final String CHANNEL_ID = "DNF-SERVER";
 
-    private DnfWebSocketServer dnfWebSocketServer;
+    private DnfSocketServer dnfSocketServer;
 
     private MediaProjectionManager projectionManager;
 
@@ -83,44 +71,13 @@ public class   DnfServerService extends Service {
         startForeground(SERVICE_NOTIFICATION_ID, notification);
     }
 
+    /**
+     * 启动后台websocket服务
+     */
     private void startForegroundWebsocket() {
         InetSocketAddress inetSocketAddress = new InetSocketAddress("127.0.0.1", 5005);
-        dnfWebSocketServer = new DnfWebSocketServer(this, inetSocketAddress);
-        dnfWebSocketServer.start();
-    }
-
-    private void startScreenCaptureService(Intent intent) {
-        projectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
-        int resultCode = intent.getIntExtra("resultCode", Activity.RESULT_CANCELED);
-        Intent data = intent.getParcelableExtra("data");
-        if (data == null) {
-            return;
-        }
-        mediaProjection = projectionManager.getMediaProjection(resultCode, data);
-        DisplayMetrics metrics = getResources().getDisplayMetrics();
-        int screenWidth = metrics.widthPixels;
-        int screenHeight = metrics.heightPixels;
-        int screenDensity = metrics.densityDpi;
-
-        ImageReader imageReader = ImageReader.newInstance(screenWidth, screenHeight, PixelFormat.RGBA_8888, 2);
-
-        Handler handler = new Handler(Looper.getMainLooper());
-        mediaProjection.createVirtualDisplay(
-                "ScreenCapture",
-                screenWidth, screenHeight, screenDensity,
-                DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
-                imageReader.getSurface(), null, handler
-        );
-        imageReader.setOnImageAvailableListener(reader -> {
-            try (Image image = reader.acquireLatestImage()) {
-                Consumer<Image> consumer = ScreenCapture.getInstance().getConsumer();
-                if (consumer == null || image == null) {
-                    return;
-                }
-                consumer.accept(image);
-                ScreenCapture.getInstance().setConsumer(null);
-            }
-        }, handler);
+        dnfSocketServer = new DnfSocketServer(inetSocketAddress);
+        dnfSocketServer.start();
     }
 
 
@@ -130,7 +87,7 @@ public class   DnfServerService extends Service {
             //启动websocket
             this.startForegroundWebsocket();
             //启动录屏服务
-            this.startScreenCaptureService(intent);
+            ScreenCapture.getInstance().startScreenCaptureService(this, intent);
             //初始化模型
             YoloV5Ncnn.getInstance(getAssets());
         } catch (Exception e) {
@@ -142,10 +99,10 @@ public class   DnfServerService extends Service {
     @Override
     public void onDestroy() {
         try {
-            if (dnfWebSocketServer == null) {
+            if (dnfSocketServer == null) {
                 return;
             }
-            dnfWebSocketServer.stop();
+            dnfSocketServer.stop();
         } catch (InterruptedException e) {
             Log.e("dnf-server", "websocket关闭失败", e);
         }

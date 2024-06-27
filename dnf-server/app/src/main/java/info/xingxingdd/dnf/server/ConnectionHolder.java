@@ -1,4 +1,4 @@
-package info.xingxingdd.dnf.connection;
+package info.xingxingdd.dnf.server;
 
 import android.util.Log;
 

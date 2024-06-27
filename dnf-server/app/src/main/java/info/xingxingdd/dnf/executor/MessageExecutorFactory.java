@@ -3,9 +3,9 @@ package info.xingxingdd.dnf.executor;
 import java.util.HashMap;
 import java.util.Map;
 
-import info.xingxingdd.dnf.executor.impl.DebugMessageExecutor;
-import info.xingxingdd.dnf.executor.impl.DetectionMessageExecutor;
-import info.xingxingdd.dnf.executor.impl.ScreenshotMessageExecutor;
+import info.xingxingdd.dnf.executor.ext.DebugMessageExecutor;
+import info.xingxingdd.dnf.executor.ext.DetectionMessageExecutor;
+import info.xingxingdd.dnf.executor.ext.ScreenshotMessageExecutor;
 
 public class MessageExecutorFactory {
 

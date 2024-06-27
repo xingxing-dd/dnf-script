@@ -88,7 +88,7 @@ public class DnfServerActivity extends ComponentActivity implements ActivityResu
     private void requestReadImagePermission() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_MEDIA_IMAGES)
                 != PackageManager.PERMISSION_GRANTED) {
-            // Permission is not granted
+
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.READ_MEDIA_IMAGES},
                     1001);

@@ -22,7 +22,7 @@ public class YoloV5Ncnn
 
     private static YoloV5Ncnn instance;
 
-    public native boolean Init(AssetManager mgr);
+    public native boolean Init(AssetManager mgr, String modelName);
 
     public class Obj
     {
@@ -36,6 +36,8 @@ public class YoloV5Ncnn
 
     public native Obj[] Detect(Bitmap bitmap, boolean use_gpu);
 
+    public native void Clear();
+
     static {
         System.loadLibrary("yolov5ncnn");
     }
@@ -43,7 +45,7 @@ public class YoloV5Ncnn
     public static YoloV5Ncnn getInstance(AssetManager assetManager) {
         if (instance == null) {
             instance = new YoloV5Ncnn();
-            instance.Init(assetManager);
+            instance.Init(assetManager, "yolov5s");
         }
         return instance;
     }

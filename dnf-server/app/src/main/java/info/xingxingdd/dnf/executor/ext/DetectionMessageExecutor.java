@@ -1,35 +1,26 @@
-package info.xingxingdd.dnf.executor.impl;
+package info.xingxingdd.dnf.executor.ext;
 
-import static androidx.core.content.ContextCompat.getSystemService;
-
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.Image;
-import android.media.projection.MediaProjection;
-import android.media.projection.MediaProjectionManager;
-import android.os.Environment;
 import android.util.Log;
 
 import com.google.gson.Gson;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
 import info.xingxingdd.dnf.assistant.ScreenCapture;
 import info.xingxingdd.dnf.assistant.YoloV5Ncnn;
-import info.xingxingdd.dnf.connection.ConnectionHolder;
+import info.xingxingdd.dnf.server.ConnectionHolder;
 import info.xingxingdd.dnf.executor.AbstractMessageExecutor;
-import info.xingxingdd.dnf.message.Input;
-import info.xingxingdd.dnf.message.Output;
+import info.xingxingdd.dnf.server.message.Input;
+import info.xingxingdd.dnf.server.message.Output;
 
 public class DetectionMessageExecutor extends AbstractMessageExecutor {
 
     @Override
-    public Output doProcess(Input input, Context context) {
+    public Output doProcess(Input input) {
         ScreenCapture.getInstance().setConsumer(image -> {
             Image.Plane[] planes = image.getPlanes();
             ByteBuffer buffer = planes[0].getBuffer();
@@ -51,7 +42,7 @@ public class DetectionMessageExecutor extends AbstractMessageExecutor {
                 output.setRequestId(input.getRequestId());
                 ConnectionHolder.getInstance().send(output);
             } catch (Exception e) {
-                Log.e("dnf-server", "Failed to save screen capture", e);
+                Log.e("dnf-server", "处理屏幕截图失败", e);
             } finally {
                 bitmap.recycle();
             }

@@ -1,6 +1,5 @@
-package info.xingxingdd.dnf.executor.impl;
+package info.xingxingdd.dnf.executor.ext;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.media.Image;
 import android.os.Environment;
@@ -13,13 +12,13 @@ import java.nio.ByteBuffer;
 
 import info.xingxingdd.dnf.assistant.ScreenCapture;
 import info.xingxingdd.dnf.executor.AbstractMessageExecutor;
-import info.xingxingdd.dnf.message.Input;
-import info.xingxingdd.dnf.message.Output;
+import info.xingxingdd.dnf.server.message.Input;
+import info.xingxingdd.dnf.server.message.Output;
 
 public class ScreenshotMessageExecutor extends AbstractMessageExecutor {
 
     @Override
-    protected Output doProcess(Input input, Context context) {
+    protected Output doProcess(Input input) {
         ScreenCapture.getInstance().setConsumer(image -> {
             Image.Plane[] planes = image.getPlanes();
             ByteBuffer buffer = planes[0].getBuffer();

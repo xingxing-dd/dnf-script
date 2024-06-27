@@ -25,6 +25,7 @@
 #include "layer.h"
 #include "net.h"
 #include "benchmark.h"
+#include <jni.h>
 
 static ncnn::UnlockedPoolAllocator g_blob_pool_allocator;
 static ncnn::PoolAllocator g_workspace_pool_allocator;
@@ -380,7 +381,7 @@ JNIEXPORT void JNI_OnUnload(JavaVM* vm, void* reserved)
 }
 
 // public native boolean Init(AssetManager mgr);
-JNIEXPORT jboolean JNICALL Java_info_xingxingdd_dnf_assistant_YoloV5Ncnn_Init(JNIEnv* env, jobject thiz, jobject assetManager)
+JNIEXPORT jboolean JNICALL Java_info_xingxingdd_dnf_assistant_YoloV5Ncnn_Init(JNIEnv* env, jobject thiz, jobject assetManager, jstring modelName)
 {
     ncnn::Option opt;
     opt.lightmode = true;
@@ -388,6 +389,17 @@ JNIEXPORT jboolean JNICALL Java_info_xingxingdd_dnf_assistant_YoloV5Ncnn_Init(JN
     opt.blob_allocator = &g_blob_pool_allocator;
     opt.workspace_allocator = &g_workspace_pool_allocator;
     opt.use_packing_layout = true;
+
+    const char* model_name_cstr = env->GetStringUTFChars(modelName, JNI_FALSE);
+    if (model_name_cstr == NULL) {
+        return JNI_FALSE;  // Out of memory
+    }
+
+    std::string model_param_file = std::string(model_name_cstr) + ".param";
+    std::string model_bin_file = std::string(model_name_cstr) + ".bin";
+
+    // 注意：记得释放model_name_cstr字符串以避免内存泄漏
+    env->ReleaseStringUTFChars(modelName, model_name_cstr);
 
     // use vulkan compute
     if (ncnn::get_gpu_count() != 0)
@@ -401,7 +413,7 @@ JNIEXPORT jboolean JNICALL Java_info_xingxingdd_dnf_assistant_YoloV5Ncnn_Init(JN
 
     // init param
     {
-        int ret = yolov5.load_param(mgr, "yolov5s.param");
+        int ret = yolov5.load_param(mgr, model_param_file.c_str());
         if (ret != 0)
         {
             __android_log_print(ANDROID_LOG_DEBUG, "YoloV5Ncnn", "load_param failed");
@@ -411,7 +423,7 @@ JNIEXPORT jboolean JNICALL Java_info_xingxingdd_dnf_assistant_YoloV5Ncnn_Init(JN
 
     // init bin
     {
-        int ret = yolov5.load_model(mgr, "yolov5s.bin");
+        int ret = yolov5.load_model(mgr, model_bin_file.c_str());
         if (ret != 0)
         {
             __android_log_print(ANDROID_LOG_DEBUG, "YoloV5Ncnn", "load_model failed");
@@ -631,6 +643,11 @@ JNIEXPORT jobjectArray JNICALL Java_info_xingxingdd_dnf_assistant_YoloV5Ncnn_Det
     __android_log_print(ANDROID_LOG_DEBUG, "YoloV5Ncnn", "%.2fms   detect", elasped);
 
     return jObjArray;
+}
+
+JNIEXPORT void JNICALL Java_info_xingxingdd_dnf_assistant_YoloV5Ncnn_Clear(JNIEnv* env, jobject thiz)
+{
+    yolov5.clear();
 }
 
 }

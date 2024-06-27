@@ -1,10 +1,6 @@
 package info.xingxingdd.dnf.server;
 
-import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -14,50 +10,41 @@ import org.java_websocket.server.WebSocketServer;
 
 import java.net.InetSocketAddress;
 
-import info.xingxingdd.dnf.connection.ConnectionHolder;
 import info.xingxingdd.dnf.executor.MessageExecutor;
 import info.xingxingdd.dnf.executor.MessageExecutorFactory;
-import info.xingxingdd.dnf.message.Input;
-import info.xingxingdd.dnf.message.Output;
+import info.xingxingdd.dnf.server.message.Input;
+import info.xingxingdd.dnf.server.message.Output;
 
-public class DnfWebSocketServer extends WebSocketServer {
+public class DnfSocketServer extends WebSocketServer {
 
     private final Gson gson = new Gson();
 
-    private final Handler mainHandler = new Handler(Looper.getMainLooper());
-
-    private final Context context;
-
     private final ConnectionHolder connectHolder = ConnectionHolder.getInstance();
 
-    public DnfWebSocketServer(Context context, InetSocketAddress inetSocketAddress) {
+    public DnfSocketServer(InetSocketAddress inetSocketAddress) {
         super(inetSocketAddress);
-        this.context = context;
     }
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
         connectHolder.set(conn);
-        //mainHandler.post(() -> Toast.makeText(context, "客户端连接成功", Toast.LENGTH_LONG).show());
         Log.i("dnf-server", "客户端连接成功");
     }
 
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
         connectHolder.remove();
-        //mainHandler.post(() -> Toast.makeText(context, "客户端连接断开", Toast.LENGTH_LONG).show());
         Log.i("dnf-server", "客户端连接断开");
     }
 
     @Override
     public void onMessage(WebSocket conn, String message) {
-        Log.i("dnf-server", "接收到客户端:" + message);
         if (message == null || message.isEmpty()) {
             return;
         }
         Input input = gson.fromJson(message, Input.class);
         MessageExecutor messageExecutor = MessageExecutorFactory.acquire(input.getAction());
-        Output output = messageExecutor.process(input, context);
+        Output output = messageExecutor.process(input);
         if (output == null) {
             return;
         }
@@ -71,8 +58,7 @@ public class DnfWebSocketServer extends WebSocketServer {
 
     @Override
     public void onStart() {
-        mainHandler.post(() -> Toast.makeText(context, "服务已启动", Toast.LENGTH_LONG).show());
-
+        Log.i("dnf-server", "服务已启动" );
     }
 
 }
