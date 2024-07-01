@@ -19,7 +19,7 @@ public class DnfSocketServer extends WebSocketServer {
 
     private final Gson gson = new Gson();
 
-    private final ConnectionHolder connectHolder = ConnectionHolder.getInstance();
+    private final ConnectionManager connectHolder = ConnectionManager.getInstance();
 
     public DnfSocketServer(InetSocketAddress inetSocketAddress) {
         super(inetSocketAddress);

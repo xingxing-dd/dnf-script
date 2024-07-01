@@ -29,6 +29,7 @@ exports.view = () => {
             </horizontal>
             <button id="sendDebugMsg" text="发送"/>
             <button id="screenshot" text="截图"/>
+            <button id="resetSkill" text="重置技能位置"/>
         </vertical>
     )
     return view
@@ -57,6 +58,18 @@ exports.action = () => {
             action: "screenshot"
         }, data => {
             console.info(data)
+        })
+    })
+    ui.resetSkill.click(function() {
+        threads.start(() => {
+            // for(var i = 0; i <= 20; i++) {
+            // }
+            sleep(10000)
+            socket.send({
+                action: "reset-skill"
+            }, data => {
+                console.info(data)
+            })
         })
     })
 }

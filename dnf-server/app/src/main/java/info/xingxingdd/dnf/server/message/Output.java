@@ -10,6 +10,8 @@ public class Output {
 
     private String desc;
 
+    private boolean requiredAck;
+
     private Map<String, Object> data;
 
     public String getRequestId() {
@@ -44,11 +46,19 @@ public class Output {
         this.data = data;
     }
 
+    public boolean isRequiredAck() {
+        return requiredAck;
+    }
+
+    public void setRequiredAck(boolean requiredAck) {
+        this.requiredAck = requiredAck;
+    }
 
     public static Output success() {
         Output output = new Output();
         output.setStatus("success");
         output.setDesc("操作成功");
+        output.setRequiredAck(false);
         return output;
     }
 
@@ -58,6 +68,7 @@ public class Output {
         output.setStatus("success");
         output.setDesc("操作成功");
         output.setData(data);
+        output.setRequiredAck(false);
         return output;
     }
 
@@ -66,14 +77,16 @@ public class Output {
         Output output = new Output();
         output.setStatus("failure");
         output.setDesc(desc);
+        output.setRequiredAck(false);
         return output;
     }
 
 
-    public static Output pending() {
+    public static Output processing() {
         Output output = new Output();
-        output.setStatus("pending");
-        output.setDesc("操作待处理");
+        output.setStatus("processing");
+        output.setDesc("操作处理中");
+        output.setRequiredAck(false);
         return output;
     }
 

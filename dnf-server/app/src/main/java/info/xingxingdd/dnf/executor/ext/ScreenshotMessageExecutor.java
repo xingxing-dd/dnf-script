@@ -19,21 +19,10 @@ public class ScreenshotMessageExecutor extends AbstractMessageExecutor {
 
     @Override
     protected Output doProcess(Input input) {
-        ScreenCapture.getInstance().setConsumer(image -> {
-            Image.Plane[] planes = image.getPlanes();
-            ByteBuffer buffer = planes[0].getBuffer();
-
-            int pixelStride = planes[0].getPixelStride();
-            int rowStride = planes[0].getRowStride();
-            int rowPadding = rowStride - pixelStride * image.getWidth();
-
-            // 创建与Image大小相同的Bitmap
-            Bitmap bitmap = Bitmap.createBitmap(image.getWidth() + rowPadding / pixelStride, image.getHeight(), Bitmap.Config.ARGB_8888);
-            buffer.rewind(); // 确保buffer的position是0
-            bitmap.copyPixelsFromBuffer(buffer);
+        ScreenCapture.getInstance().setConsumer(bitmap -> {
 
             // 裁剪掉可能存在的填充部分
-            Bitmap croppedBitmap = Bitmap.createBitmap(bitmap, 0, 0, image.getWidth(), image.getHeight());
+            Bitmap croppedBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight());
 
             // 保存croppedBitmap到文件中
             File directory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);// 获取内部存储目录

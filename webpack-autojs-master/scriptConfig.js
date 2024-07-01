@@ -18,6 +18,7 @@ var projects = [ //项目数组，放的是每一个要编译的项目，
     others: ['./main.js'] //其他需要编译的文件,可以包含入口，也可不包含
   },
   { id: 7, compile: false, name: "dnf", main: "./main.js" },
+  { id: 8, compile: false, name: "ocr", main: "./main.js" },
 ]
 
 var config = {

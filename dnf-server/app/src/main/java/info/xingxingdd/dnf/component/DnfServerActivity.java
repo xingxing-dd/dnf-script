@@ -1,7 +1,6 @@
 package info.xingxingdd.dnf.component;
 
 import android.Manifest;
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -23,42 +22,36 @@ import androidx.annotation.RequiresApi;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import info.xingxingdd.dnf.DnfServerApplication;
-import info.xingxingdd.dnf.assistant.YoloV5Ncnn;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.List;
 import java.util.stream.Collectors;
 
-import info.xingxingdd.dnf.R;
+import info.xingxingdd.dnf.DnfServerApplication;
+import info.xingxingdd.yolov5.library.YoloV5Ncnn;
 
 public class DnfServerActivity extends ComponentActivity implements ActivityResultCallback<ActivityResult> {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        YoloV5Ncnn yoloV5Ncnn = new YoloV5Ncnn();
-//        boolean result = yoloV5Ncnn.Init(getAssets());
-//        AssetManager assetManager = getAssets();
-//
-//        // 打开 assets 目录下的图片文件
-//        InputStream inputStream = null;
+////        boolean result = yoloV5Ncnn.Init(getAssets());
+//          AssetManager assetManager = getAssets();
+//         YoloV5Ncnn yoloV5Ncnn = YoloV5Ncnn.getInstance(assetManager, "yolov5s");
+////
+////        // 打开 assets 目录下的图片文件
+////        InputStream inputStream = null;
 //        try {
-//            inputStream = assetManager.open("frame_000057.jpg");
+//            InputStream inputStream = assetManager.open("frame_000057.jpg");
 //            // 将输入流解码为 Bitmap
 //            Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
 //
 //            // 关闭输入流
 //            inputStream.close();
-//            YoloV5Ncnn.Obj[] results = yoloV5Ncnn.Detect(bitmap, false);
+//            YoloV5Ncnn.Obj[] results = yoloV5Ncnn.detect(bitmap, false);
 //            String labels = Arrays.stream(results).map(r -> r.label).collect(Collectors.joining(","));
-//            if (!result) {
-//                Toast.makeText(this, "注册失败", Toast.LENGTH_LONG).show();
-//            } else {
-//                Toast.makeText(this, "注册完成:" + labels, Toast.LENGTH_LONG).show();
-//            }
+//
+//            Toast.makeText(this, "注册完成:" + labels, Toast.LENGTH_LONG).show();
 //        } catch (IOException e) {
 //            throw new RuntimeException(e);
 //        }

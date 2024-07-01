@@ -4,12 +4,16 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 
+import java.util.Objects;
+
+import info.xingxingdd.dnf.server.ConnectionManager;
 import info.xingxingdd.dnf.server.message.Input;
 import info.xingxingdd.dnf.server.message.Output;
+import info.xingxingdd.dnf.server.session.Session;
 
 public abstract class AbstractMessageExecutor implements MessageExecutor {
 
-    private final MessageExecutorContext executorContext = new MessageExecutorContext();
+    protected final ConnectionManager connectionManager = ConnectionManager.getInstance();
 
     @Override
     public Output process(Input input) {
@@ -20,7 +24,9 @@ public abstract class AbstractMessageExecutor implements MessageExecutor {
     }
 
     protected void doBefore(Input input) {
-        executorContext.setValue("requestId", input.getRequestId());
+        Session session = connectionManager.createSession(input.getRequestId());
+        session.setStatus("processing");
+        session.setAction(input.getAction());
         Log.i("dnf-server", new Gson().toJson(input));
     }
 
@@ -29,6 +35,11 @@ public abstract class AbstractMessageExecutor implements MessageExecutor {
     protected void doAfter(Input input, Output output) {
         output.setRequestId(input.getRequestId());
         Log.i("dnf-server", new Gson().toJson(output));
+        if (Objects.equals("processing", output.getStatus())) {
+            return;
+        }
+        //如果已完成，那么移除session
+        connectionManager.closeSession(output.getRequestId());
     }
 
 }

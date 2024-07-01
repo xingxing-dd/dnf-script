@@ -6,6 +6,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.os.Build;
@@ -21,8 +22,8 @@ import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+import info.xingxingdd.dnf.assistant.DetectionAssistant;
 import info.xingxingdd.dnf.assistant.ScreenCapture;
-import info.xingxingdd.dnf.assistant.YoloV5Ncnn;
 import info.xingxingdd.dnf.server.DnfSocketServer;
 import info.xingxingdd.dnf.R;
 
@@ -34,9 +35,7 @@ public class   DnfServerService extends Service {
 
     private DnfSocketServer dnfSocketServer;
 
-    private MediaProjectionManager projectionManager;
-
-    private MediaProjection mediaProjection;
+    private DnfBroadcastReceiver broadcastReceiver;
 
     @Nullable
     @Override
@@ -67,8 +66,19 @@ public class   DnfServerService extends Service {
                 .setContentText("DNF助手后台服务运行中")
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentIntent(pendingIntent)
+                .addAction(new NotificationCompat.Action(
+                        R.drawable.ic_exit, // 退出按钮的图标资源
+                        "退出", // 退出按钮的标签
+                        createStopServicePendingIntent() // 退出按钮的PendingIntent
+                ))
                 .build();
         startForeground(SERVICE_NOTIFICATION_ID, notification);
+    }
+
+    private PendingIntent createStopServicePendingIntent() {
+        Intent stopIntent = new Intent(this, DnfBroadcastReceiver.class);
+        stopIntent.setAction("info.xingxingdd.dnf.action.STOP_SERVICE");
+        return PendingIntent.getBroadcast(this, 0, stopIntent, PendingIntent.FLAG_IMMUTABLE);
     }
 
     /**
@@ -80,16 +90,31 @@ public class   DnfServerService extends Service {
         dnfSocketServer.start();
     }
 
+    private void registerDnfBroadcastReceiver() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_CONFIGURATION_CHANGED);
+        broadcastReceiver = new DnfBroadcastReceiver();
+        registerReceiver(broadcastReceiver, filter);
+    }
+
+    private void startScreenCaptureService(Intent intent) {
+        ScreenCapture screenCapture = ScreenCapture.getInstance();
+        screenCapture.initScreenCaptureService(this, intent);
+        screenCapture.start(getResources().getDisplayMetrics());
+    }
+
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         try {
             //启动websocket
             this.startForegroundWebsocket();
+            //注册广播
+            this.registerDnfBroadcastReceiver();
             //启动录屏服务
-            ScreenCapture.getInstance().startScreenCaptureService(this, intent);
+            this.startScreenCaptureService(intent);
             //初始化模型
-            YoloV5Ncnn.getInstance(getAssets());
+            DetectionAssistant.initDetectionEngine(this);
         } catch (Exception e) {
             Toast.makeText(this, "打开服务失败:" + Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.joining(",")), Toast.LENGTH_LONG).show();
         }
@@ -103,6 +128,9 @@ public class   DnfServerService extends Service {
                 return;
             }
             dnfSocketServer.stop();
+            //关闭资源
+            ScreenCapture.getInstance().stop();
+            unregisterReceiver(broadcastReceiver);
         } catch (InterruptedException e) {
             Log.e("dnf-server", "websocket关闭失败", e);
         }
