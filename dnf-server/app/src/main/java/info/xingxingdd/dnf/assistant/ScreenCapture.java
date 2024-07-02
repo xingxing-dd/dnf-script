@@ -21,6 +21,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -133,16 +135,26 @@ public class ScreenCapture implements ImageReader.OnImageAvailableListener {
 
     @Override
     public void onImageAvailable(ImageReader reader) {
-        Log.i("dnf-server", "当前执行task:" + (screenCaptureTask != null) + ",是否可执行:" + (screenCaptureTask != null && screenCaptureTask.isAvailable()));
         try (Image image = reader.acquireLatestImage()) {
             List<ScreenCaptureTask> availableTasks = screenCaptureTasks.stream().filter(ScreenCaptureTask::isAvailable).collect(Collectors.toList());
+            Log.i("dnf-server", "当前执行task:" + (screenCaptureTask != null) + ",是否可执行:" + (screenCaptureTask != null && screenCaptureTask.isAvailable()));
             if (availableTasks.isEmpty()) {
                 return;
             }
             Bitmap screenshot = BitmapUtils.convertImageToBitmap(image);
-            List<Future<Boolean>> features = screenCaptureTasks.stream().peek(task -> task.refresh(screenshot)).
-                    map(executor::submit).
-                    collect(Collectors.toList());
+            Map<String, Future<Boolean>> futures = screenCaptureTasks.stream().peek(task -> task.refresh(screenshot)).
+                    collect(Collectors.toMap(ScreenCaptureTask::getRequestId, executor::submit, (a, b) -> a));
+            screenCaptureTasks.removeIf(task -> {
+                try {
+                    Future<Boolean> future = futures.get(task.getRequestId());
+                    if (future == null) {
+                        return false;
+                    }
+                    return future.get();
+                } catch (ExecutionException | InterruptedException e) {
+                    return false;
+                }
+            });
         } catch (Exception e) {
             Log.e("dnf-server", "执行帧处理异常:" + e.getLocalizedMessage());
         }
