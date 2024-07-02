@@ -1,5 +1,6 @@
 [versions]
 agp = "8.4.2"
+bus = "1.0.2"
 gson = "2.10.1"
 javaWebsocket = "1.5.2"
 junit = "4.13.2"
@@ -10,6 +11,7 @@ material = "1.10.0"
 tensorflowLite = "2.4.0"
 
 [libraries]
+bus = { module = "com.mcxiaoke.xbus:bus", version.ref = "bus" }
 gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 java-websocket = { module = "org.java-websocket:Java-WebSocket", version.ref = "javaWebsocket" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

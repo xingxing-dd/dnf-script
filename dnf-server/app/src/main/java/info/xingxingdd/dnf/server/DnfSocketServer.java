@@ -10,6 +10,7 @@ import org.java_websocket.server.WebSocketServer;
 
 import java.net.InetSocketAddress;
 
+import info.xingxingdd.dnf.assistant.ScreenCapture;
 import info.xingxingdd.dnf.executor.MessageExecutor;
 import info.xingxingdd.dnf.executor.MessageExecutorFactory;
 import info.xingxingdd.dnf.server.message.Input;

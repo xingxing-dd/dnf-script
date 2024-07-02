@@ -8,12 +8,13 @@ import info.xingxingdd.dnf.server.message.Output;
 
 public abstract class AbstractAsyncMessageExecutor extends AbstractMessageExecutor {
 
-    protected final ExecutorService executor = Executors.newFixedThreadPool(2);
-
     @Override
     protected Output doProcess(Input input) {
-        Runnable executeTask = () -> doAsyncProcess(input);
-        executor.execute(executeTask);
+        try {
+            doAsyncProcess(input);
+        } catch (Exception e) {
+            return Output.failure(e.getLocalizedMessage());
+        }
         return Output.processing();
     }
 

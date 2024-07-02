@@ -26,6 +26,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -40,9 +41,9 @@ public class ScreenCapture implements ImageReader.OnImageAvailableListener {
 
     private final Handler handler = new Handler(Looper.getMainLooper());
 
-    private Consumer<Bitmap> consumer;
+    private final ReentrantLock imageProcessTaskLock = new ReentrantLock();
 
-    private MediaProjectionManager projectionManager;
+    private Consumer<Bitmap> consumer;
 
     private ScreenCaptureTask screenCaptureTask;
 
@@ -65,17 +66,8 @@ public class ScreenCapture implements ImageReader.OnImageAvailableListener {
         this.screenCaptureTasks = new ArrayList<>();
     }
 
-    public void setConsumer(Consumer<Bitmap> consumer) {
-        this.consumer = consumer;
-    }
-
-    public Consumer<Bitmap> getConsumer() {
-        return consumer;
-    }
-
-
     public void initScreenCaptureService(Context context, Intent intent) {
-        projectionManager = (MediaProjectionManager) context.getSystemService(Context.MEDIA_PROJECTION_SERVICE);
+        MediaProjectionManager projectionManager = (MediaProjectionManager) context.getSystemService(Context.MEDIA_PROJECTION_SERVICE);
         int resultCode = intent.getIntExtra("resultCode", Activity.RESULT_CANCELED);
         Intent data = intent.getParcelableExtra("data");
         if (data == null) {
@@ -107,37 +99,27 @@ public class ScreenCapture implements ImageReader.OnImageAvailableListener {
         }
         start(metrics);
     }
-    /**
-     * 启动录屏服务
-     */
-    public void startScreenCaptureService(Context context, Intent intent) {
-        projectionManager = (MediaProjectionManager) context.getSystemService(Context.MEDIA_PROJECTION_SERVICE);
-        int resultCode = intent.getIntExtra("resultCode", Activity.RESULT_CANCELED);
-        Intent data = intent.getParcelableExtra("data");
-        if (data == null) {
-            return;
-        }
-        mediaProjection = projectionManager.getMediaProjection(resultCode, data);
-        DisplayMetrics metrics = context.getResources().getDisplayMetrics();
-        int screenWidth = metrics.widthPixels;
-        int screenHeight = metrics.heightPixels;
-        int screenDensity = metrics.densityDpi;
-        imageReader = ImageReader.newInstance(screenWidth, screenHeight, PixelFormat.RGBA_8888, 2);
-        Handler handler = new Handler(Looper.getMainLooper());
-        virtualDisplay = mediaProjection.createVirtualDisplay(
-                "ScreenCapture",
-                screenWidth, screenHeight, screenDensity,
-                DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
-                imageReader.getSurface(), null, handler
-        );
-        imageReader.setOnImageAvailableListener(this, handler);
-    }
 
     @Override
     public void onImageAvailable(ImageReader reader) {
         try (Image image = reader.acquireLatestImage()) {
+            if (!imageProcessTaskLock.tryLock()) {
+                return;
+            }
+            executeImageProcessTask(image);
+        } catch (Exception e) {
+            Log.e("dnf-server", "执行帧处理异常:" + e.getLocalizedMessage());
+        }
+    }
+
+    /**
+     * 执行处理图片任务
+     * @param image
+     */
+    private void executeImageProcessTask(Image image) {
+        try {
             List<ScreenCaptureTask> availableTasks = screenCaptureTasks.stream().filter(ScreenCaptureTask::isAvailable).collect(Collectors.toList());
-            Log.i("dnf-server", "当前执行task:" + (screenCaptureTask != null) + ",是否可执行:" + (screenCaptureTask != null && screenCaptureTask.isAvailable()));
+            Log.i("dnf-server", "当前执行task:" + screenCaptureTasks.size());
             if (availableTasks.isEmpty()) {
                 return;
             }
@@ -155,14 +137,22 @@ public class ScreenCapture implements ImageReader.OnImageAvailableListener {
                     return false;
                 }
             });
-        } catch (Exception e) {
-            Log.e("dnf-server", "执行帧处理异常:" + e.getLocalizedMessage());
+        } finally {
+            imageProcessTaskLock.unlock();
         }
     }
 
-    public void setScreenCaptureTask(ScreenCaptureTask screenCaptureTask) {
-        this.screenCaptureTask = screenCaptureTask;
+    public synchronized void addScreenCaptureTask(ScreenCaptureTask task) {
+        ScreenCaptureTask existTask = screenCaptureTasks.stream().filter(t -> t.getClass().getName().equals(task.getClass().getName()))
+                .findFirst()
+                .orElse(null);
+        if (existTask != null) {
+            return;
+        }
+        screenCaptureTasks.add(task);
     }
+
+
 
     public void stop() {
         if (mediaProjection != null) {

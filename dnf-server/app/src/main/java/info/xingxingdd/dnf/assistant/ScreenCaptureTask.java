@@ -15,6 +15,12 @@ public abstract class ScreenCaptureTask implements Callable<Boolean> {
 
     private Bitmap screenshot;
 
+    public ScreenCaptureTask(String requestId) {
+        this.interval = 2000;
+        this.nextTime = System.currentTimeMillis();
+        this.requestId = requestId;
+    }
+
     public ScreenCaptureTask(String requestId, long interval) {
         this.interval = interval;
         this.nextTime = System.currentTimeMillis();
@@ -33,14 +39,12 @@ public abstract class ScreenCaptureTask implements Callable<Boolean> {
         return result;
     }
 
-    public abstract boolean process(Bitmap screenshot);
+    protected abstract boolean process(Bitmap screenshot);
 
     public boolean isAvailable() {
         Log.i("dnf-server", "当前时间:" + System.currentTimeMillis() + ",下一次执行时间:" + this.nextTime);
         return System.currentTimeMillis() >= this.nextTime;
     }
-
-    protected abstract boolean doProcess(Bitmap bitmap);
 
     public String getRequestId() {
         return requestId;
