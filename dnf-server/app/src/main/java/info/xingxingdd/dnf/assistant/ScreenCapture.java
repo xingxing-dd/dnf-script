@@ -91,12 +91,9 @@ public class ScreenCapture implements ImageReader.OnImageAvailableListener {
     }
 
     public void resize(DisplayMetrics metrics) {
-        if (imageReader != null) {
-            virtualDisplay.release();
-            virtualDisplay = null;
-            imageReader.close();
-            imageReader = null;
-        }
+        //释放现有资源
+        release();
+        //重新启动
         start(metrics);
     }
 
@@ -152,7 +149,17 @@ public class ScreenCapture implements ImageReader.OnImageAvailableListener {
         screenCaptureTasks.add(task);
     }
 
+    public void release() {
+        if (imageReader != null) {
+            imageReader.close();
+            imageReader = null;
+        }
+        if (virtualDisplay != null) {
+            virtualDisplay.release();
+            virtualDisplay = null;
+        }
 
+    }
 
     public void stop() {
         if (mediaProjection != null) {
