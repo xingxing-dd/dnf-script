@@ -12,21 +12,44 @@ var skills = {
         y: 790
     }
 }
-var textLabels = []
+var textLabels = {}
 
-exports.detectLabels = (screentshotPath) => {
+var processing = false
+
+exports.analysis = (screentshotPath) => {
     let screentshot = images.read(screentshotPath)
-    if (screentshot == null) {
+    if (screentshot == null || processing) {
         console.info("获取屏幕截图为空:" + screentshotPath)
         return
     }
-    let start = new Date()
-    let result = gmlkit.ocr(img, "zh")
-    console.info('OCR识别耗时：' + (new Date() - start) + 'ms')
+    processing = true
+    let result = gmlkit.ocr(screentshot, "zh")
     if (!result || !result.children) {
         return
     }
+    var tmpLabels = {}
     for (var index = 0; index < result.children.length; index++) {
-        let label = result.children[index]
+        let textLabel = result.children[index]
+        if (!textLabel || !textLabel.text) {
+            continue
+        }
+        tmpLabels[textLabel.text] = textLabel.bounds
     }
+    textLabels = tmpLabels
+    console.info(textLabels)
+    processing = false
+}
+//https://blog.csdn.net/m0_63493883/article/details/131395062
+exports.detect = (targets) => {
+    for (var index = 0; index < targets.length; index++) {
+        var position = textLabels[targets[index]]
+        if (!position) {
+            continue
+        }
+        return {
+            x: Math.floor(position.left + Math.random() * (position.right - position.left + 1)),
+            y: Math.floor(position.top + Math.random() * (position.bottom - position.top + 1))
+        }
+    }
+    return null
 }

@@ -36,6 +36,7 @@ exports.view = () => {
 }
 exports.action = () => {
     var socket = require("../common/socket")
+    var position = require("../common/position")
     ui.sendDebugMsg.click(function(){
         var filePath = ui.filePath.getText()
         console.info(filePath)
@@ -58,6 +59,15 @@ exports.action = () => {
             action: "screenshot"
         }, data => {
             console.info(data)
+            if (!data || !data.screenshot) { 
+                return
+            }
+            position.analysis(data.screenshot)
+            console.info(position.detect(["角色"]))
+            var p = position.detect(["角色"])
+            if (p) {
+                click(p.x, p.y)
+            }
         })
     })
     ui.resetSkill.click(function() {

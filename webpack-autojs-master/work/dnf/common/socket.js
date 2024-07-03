@@ -79,6 +79,6 @@ exports.send = (message, func) => {
     var requestId = generateUUID()
     message.requestId = requestId
     callback[requestId] = func
-    console.info(JSON.stringify(message))
+    console.info("发送消息:" + JSON.stringify(message))
     socket.send(JSON.stringify(message))
 }
