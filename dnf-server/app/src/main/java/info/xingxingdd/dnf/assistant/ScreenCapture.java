@@ -116,7 +116,7 @@ public class ScreenCapture implements ImageReader.OnImageAvailableListener {
     private void executeImageProcessTask(Image image) {
         try {
             List<ScreenCaptureTask> availableTasks = screenCaptureTasks.stream().filter(ScreenCaptureTask::isAvailable).collect(Collectors.toList());
-            Log.i("dnf-server", "当前执行task:" + screenCaptureTasks.size());
+            Log.d("dnf-server", "当前执行task:" + screenCaptureTasks.size());
             if (availableTasks.isEmpty()) {
                 return;
             }

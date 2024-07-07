@@ -53,3 +53,6 @@ exports.detect = (targets) => {
     }
     return null
 }
+//ssh -p 49516 root@xerfjbtrw1vzgmsmsnow.deepln.com
+// yolov5s
+// python tools/export_model.py -c .\configs\rec\ch_ppocr_v2.0\rec_chinese_lite_train_v2.0.yml -o Global.checkpoints=.\output\rec_chinese_lite_v2.0\best_accuracy  Global.save_inference_dir=.\inference\rec

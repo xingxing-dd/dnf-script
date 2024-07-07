@@ -1,42 +1,50 @@
 package info.xingxingdd.dnf.executor.ext;
 
 import android.graphics.Bitmap;
-import android.media.Image;
 import android.util.Log;
 
 import com.google.gson.Gson;
 
-import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import info.xingxingdd.dnf.assistant.ScreenCapture;
-import info.xingxingdd.dnf.server.ConnectionManager;
-import info.xingxingdd.dnf.executor.AbstractMessageExecutor;
+import info.xingxingdd.dnf.assistant.ScreenCaptureTask;
+import info.xingxingdd.dnf.executor.AbstractAsyncMessageExecutor;
 import info.xingxingdd.dnf.server.message.Input;
 import info.xingxingdd.dnf.server.message.Output;
 import info.xingxingdd.yolov5.library.YoloV5Ncnn;
 
-public class DetectionMessageExecutor extends AbstractMessageExecutor {
+public class DetectionMessageExecutor extends AbstractAsyncMessageExecutor {
+
+    //"berserker", "unattachable_monsters", "attachable_monsters", "blocked_portal",
+    //            "unblocked_portal", "direction_guidance"
 
     @Override
-    public Output doProcess(Input input) {
-//        ScreenCapture.getInstance().setConsumer(bitmap -> {
-//            try {
-//                YoloV5Ncnn.Obj[] objs = YoloV5Ncnn.getInstance().detect(bitmap, false);
-//                Log.i("dnf-server", "Screen capture saved: ");
-//                Map<String, Object> data = new HashMap<>();
-//                data.put("objs", new Gson().toJson(objs));
-//                Output output = Output.success(data);
-//                output.setRequestId(input.getRequestId());
-//                ConnectionManager.getInstance().send(output);
-//            } catch (Exception e) {
-//                Log.e("dnf-server", "处理屏幕截图失败", e);
-//            } finally {
-//                bitmap.recycle();
-//            }
-//        });
-        return Output.processing();
-    }
+    protected void doAsyncProcess(Input input) {
 
+        ScreenCaptureTask screenCaptureTask = new ScreenCaptureTask(input.getRequestId()) {
+
+            @Override
+            protected boolean process(Bitmap screenshot) {
+                try {
+                    YoloV5Ncnn.Obj[] targets = YoloV5Ncnn.getInstance().detect(screenshot, false);
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("targets", Arrays.stream(targets).collect(Collectors.groupingBy(obj -> obj.label)));
+                    Output output = Output.processing();
+                    output.setRequestId(getRequestId());
+                    output.setData(data);
+                    connectionManager.send(output);
+                    Log.i("dnf-server", "识别到目标:" + new Gson().toJson(targets));
+                } catch (Exception e) {
+                    Log.e("dnf-server", "生成截图文件异常: " + e.getLocalizedMessage());
+                }
+                return false;
+            }
+
+        };
+        ScreenCapture.getInstance().addScreenCaptureTask(screenCaptureTask);
+    }
 }

@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.os.Environment;
 import android.util.Log;
 
+import com.google.gson.Gson;
+
 import java.io.FileOutputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +15,7 @@ import info.xingxingdd.dnf.assistant.ScreenCaptureTask;
 import info.xingxingdd.dnf.executor.AbstractAsyncMessageExecutor;
 import info.xingxingdd.dnf.server.message.Input;
 import info.xingxingdd.dnf.server.message.Output;
+import info.xingxingdd.yolov5.library.YoloV5Ncnn;
 
 public class ScreenshotMessageExecutor extends AbstractAsyncMessageExecutor {
 
@@ -35,6 +38,8 @@ public class ScreenshotMessageExecutor extends AbstractAsyncMessageExecutor {
                     output.setRequestId(getRequestId());
                     output.setData(data);
                     connectionManager.send(output);
+                    YoloV5Ncnn.Obj[] targets = YoloV5Ncnn.getInstance().detect(screenshot, false);
+                    Log.i("dnf-server", "识别到目标:" + new Gson().toJson(targets));
                 } catch (Exception e) {
                     Log.e("dnf-server", "生成截图文件异常: " + e.getLocalizedMessage());
                 }

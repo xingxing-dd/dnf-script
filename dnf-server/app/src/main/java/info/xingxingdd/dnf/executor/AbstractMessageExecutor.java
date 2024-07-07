@@ -27,14 +27,14 @@ public abstract class AbstractMessageExecutor implements MessageExecutor {
         Session session = connectionManager.createSession(input.getRequestId());
         session.setStatus("processing");
         session.setAction(input.getAction());
-        Log.i("dnf-server", new Gson().toJson(input));
+        Log.d("dnf-server", new Gson().toJson(input));
     }
 
     protected abstract Output doProcess(Input input);
 
     protected void doAfter(Input input, Output output) {
         output.setRequestId(input.getRequestId());
-        Log.i("dnf-server", new Gson().toJson(output));
+        Log.d("dnf-server", new Gson().toJson(output));
         if (Objects.equals("processing", output.getStatus())) {
             return;
         }

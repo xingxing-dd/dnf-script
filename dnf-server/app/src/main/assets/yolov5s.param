@@ -164,12 +164,12 @@ Swish                    silu_118                 1 1 183 184
 Concat                   cat_12                   2 1 182 184 185 0=0
 Convolution              conv_56                  1 1 185 186 0=512 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=262144
 Swish                    silu_119                 1 1 186 187
-Convolution              conv_57                  1 1 152 188 0=63 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=8064
+Convolution              conv_57                  1 1 152 188 0=33 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=4224
 Permute                  permute_128              1 1 188 189 0=3
 Sigmoid                  sigmoid_122              1 1 189 out0
-Convolution              conv_58                  1 1 170 191 0=63 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=16128
+Convolution              conv_58                  1 1 170 191 0=33 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=8448
 Permute                  permute_129              1 1 191 192 0=3
 Sigmoid                  sigmoid_123              1 1 192 out1
-Convolution              conv_59                  1 1 187 194 0=63 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=32256
+Convolution              conv_59                  1 1 187 194 0=33 1=1 11=1 12=1 13=1 14=0 2=1 3=1 4=0 5=1 6=16896
 Permute                  permute_130              1 1 194 195 0=3
 Sigmoid                  sigmoid_124              1 1 195 out2

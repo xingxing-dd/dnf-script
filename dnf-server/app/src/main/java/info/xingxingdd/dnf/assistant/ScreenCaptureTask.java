@@ -42,7 +42,7 @@ public abstract class ScreenCaptureTask implements Callable<Boolean> {
     protected abstract boolean process(Bitmap screenshot);
 
     public boolean isAvailable() {
-        Log.i("dnf-server", "当前时间:" + System.currentTimeMillis() + ",下一次执行时间:" + this.nextTime);
+        Log.d("dnf-server", "当前时间:" + System.currentTimeMillis() + ",下一次执行时间:" + this.nextTime);
         return System.currentTimeMillis() >= this.nextTime;
     }
 
