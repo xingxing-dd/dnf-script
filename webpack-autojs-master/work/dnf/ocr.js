@@ -1,1 +1,4 @@
-desc("地下城与勇士：起源").findOne().click()
+let img = images.read("1.jpg")
+console.info(img)
+let result = gmlkit.ocr(img, "zh")
+console.info(result)

@@ -4,6 +4,14 @@
     "ignore": [
         "build"
     ],
+    "libs": [
+      "libtesseract.so",
+      "libpng.so",
+      "libleptonica.so",
+      "libjpeg.so",
+      "libjackpal-androidterm5.so",
+      "libjackpal-termexec2.so"
+    ],  
     "launchConfig": {
         "hideLogs": true
     },

@@ -8,6 +8,18 @@ exports.loadView = (view) => {
     }
     module.action()
 }
+exports.loadContent = (content, parent) => {
+    console.log("加载页面：" + content)
+    if (parent) {
+        parent.close()
+    }
+    const compoment = require("../content/" + content)
+    compoment.display()
+    if (!compoment.action) {
+        return
+    }
+    compoment.action()
+}
 
 exports.downloadServer = () => {
     log(config)

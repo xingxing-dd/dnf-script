@@ -28,6 +28,10 @@ public class DnfSocketServer extends WebSocketServer {
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
+        WebSocket history = connectHolder.getConnection();
+        if (history != null) {
+            history.close();
+        }
         connectHolder.set(conn);
         Log.i("dnf-server", "客户端连接成功");
     }

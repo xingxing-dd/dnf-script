@@ -32,6 +32,10 @@ public class ConnectionManager {
         this.connection = connection;
     }
 
+    public WebSocket getConnection() {
+        return connection;
+    }
+
     public void remove() {
         if (this.connection.isOpen()) {
             this.connection.close();

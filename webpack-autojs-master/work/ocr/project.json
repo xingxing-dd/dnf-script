@@ -23,7 +23,7 @@
     "launchConfig": {
       "displaySplash": false,
       "hideLauncher": false,
-      "hideLogs": false,
+      "hideLogs": true,
       "stableMode": false,
       "volumeUpcontrol": false,
       "permissions": [],
@@ -32,6 +32,7 @@
       "splashText": "Powered by paddle ocr"
     },
     "libs": [
+      "libtesseract.so",
       "libc++_shared.so",
       "libpaddle_light_api_shared.so",
       "libhiai.so",
@@ -41,6 +42,7 @@
       "libjackpal-androidterm5.so",
       "libjackpal-termexec2.so"
     ],
+  
     "main": "main.js",
     "name": "PaddleOCR",
     "outputPath": null,

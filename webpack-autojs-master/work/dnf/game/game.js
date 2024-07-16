@@ -232,10 +232,7 @@ exports.start = () => {
     //     process(data.targets)
     //     processing = false
     // })
-    if(intervalId) {
-        clearInterval(intervalId)
-    }
-    intervalId = setInterval(() => {
+    for(;;) {
         if (processing) {
             return
         }
@@ -249,7 +246,8 @@ exports.start = () => {
             }
             processing = false
         })
-    }, 500)
+        sleep(500)
+    }
 }
 
 exports.stop = () => {

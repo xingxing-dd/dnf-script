@@ -1,6 +1,7 @@
 importPackage(Packages["okhttp3"]); //导入包
 var config = require("./config").config()
 var socket = null
+var client = null
 var status = "closed"
 var callback = {}
 var generateUUID = () => {
@@ -12,7 +13,7 @@ var generateUUID = () => {
 }
 
 var createConnection = () => {
-    var client = new OkHttpClient.Builder().retryOnConnectionFailure(true).build()
+    client = new OkHttpClient.Builder().retryOnConnectionFailure(true).build()
     var request = new Request.Builder().url(config.wsServerUrl).build() //vscode  插件的ip地址，
     client.dispatcher().cancelAll();//清理一次
     listener = {
@@ -59,6 +60,9 @@ var createConnection = () => {
 
 exports.connect = () => {
     for (var retryTimes = 0; retryTimes < 5; retryTimes++) {
+        if(status == 'success') {
+            return
+        }
         createConnection()
         while(status == 'pending') {
             sleep(500)
@@ -72,6 +76,9 @@ exports.connect = () => {
 }
 
 exports.close = () => {
+    if (socket == null) {
+        return
+    }
     socket.close()
 }
 
