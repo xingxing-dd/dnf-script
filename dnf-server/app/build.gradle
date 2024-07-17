@@ -40,6 +40,7 @@ dependencies {
     androidTestImplementation libs.espresso.core
     implementation libs.gson
     implementation libs.bus
+    implementation libs.text.recognition.chinese
 
     implementation(fileTree("libs"))
 }

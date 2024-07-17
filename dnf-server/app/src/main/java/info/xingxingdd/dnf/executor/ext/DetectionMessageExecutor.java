@@ -4,7 +4,9 @@ import android.graphics.Bitmap;
 import android.os.Environment;
 import android.util.Log;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.gson.Gson;
+import com.google.mlkit.vision.text.Text;
 
 import java.io.FileOutputStream;
 import java.util.Arrays;
@@ -12,6 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import info.xingxingdd.dnf.assistant.DetectionAssistant;
 import info.xingxingdd.dnf.assistant.ScreenCapture;
 import info.xingxingdd.dnf.assistant.ScreenCaptureTask;
 import info.xingxingdd.dnf.executor.AbstractAsyncMessageExecutor;
@@ -35,11 +38,17 @@ public class DetectionMessageExecutor extends AbstractAsyncMessageExecutor {
             @Override
             protected boolean process(Bitmap screenshot) {
                 try {
-                    YoloV5Ncnn.Obj[] targets = YoloV5Ncnn.getInstance().detect(screenshot, false);
+                    YoloV5Ncnn.Obj[] targets = DetectionAssistant.yoloV5Ncnn.detect(screenshot, false);
                     Map<String, Object> data = new HashMap<>();
                     if (targets != null && targets.length > 0) {
                         data.put("targets", Arrays.stream(targets).collect(Collectors.groupingBy(obj -> obj.label)));
                     }
+                    DetectionAssistant.recognizer.process(screenshot, 0).addOnSuccessListener(new OnSuccessListener<Text>() {
+                        @Override
+                        public void onSuccess(Text text) {
+                            Log.i("dnf-server", "识别到目标:" + text.getText());
+                        }
+                    });
                     Output output = Output.success();
                     output.setRequestId(getRequestId());
                     output.setData(data);

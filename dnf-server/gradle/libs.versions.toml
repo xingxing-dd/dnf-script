@@ -9,6 +9,7 @@ espressoCore = "3.5.1"
 appcompat = "1.6.1"
 material = "1.10.0"
 tensorflowLite = "2.4.0"
+textRecognitionChinese = "16.0.0"
 
 [libraries]
 bus = { module = "com.mcxiaoke.xbus:bus", version.ref = "bus" }
@@ -21,6 +22,7 @@ appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "a
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 tensorflow-lite = { module = "org.tensorflow:tensorflow-lite", version.ref = "tensorflowLite" }
 tensorflow-lite-gpu = { module = "org.tensorflow:tensorflow-lite-gpu", version.ref = "tensorflowLite" }
+text-recognition-chinese = { module = "com.google.mlkit:text-recognition-chinese", version.ref = "textRecognitionChinese" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
