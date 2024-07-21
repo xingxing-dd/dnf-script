@@ -25,6 +25,8 @@ import info.xingxingdd.yolov5.library.YoloV5Ncnn;
 
 public class DetectionMessageExecutor extends AbstractAsyncMessageExecutor {
 
+    public static int index = 0;
+
     private final String screenshotFileDir = Environment.getExternalStorageDirectory().getAbsolutePath();
 
     //"berserker", "unattachable_monsters", "attachable_monsters", "blocked_portal",
@@ -43,18 +45,14 @@ public class DetectionMessageExecutor extends AbstractAsyncMessageExecutor {
                     if (targets != null && targets.length > 0) {
                         data.put("targets", Arrays.stream(targets).collect(Collectors.groupingBy(obj -> obj.label)));
                     }
-                    DetectionAssistant.recognizer.process(screenshot, 0).addOnSuccessListener(new OnSuccessListener<Text>() {
-                        @Override
-                        public void onSuccess(Text text) {
-                            Log.i("dnf-server", "识别到目标:" + text.getText());
-                        }
-                    });
                     Output output = Output.success();
                     output.setRequestId(getRequestId());
                     output.setData(data);
                     connectionManager.send(output);
                     if (targets != null && targets.length > 0) {
                         saveResult(screenshot, targets);
+                        saveOrigin(screenshot);
+                        index = index + 1;
                     }
                     Log.i("dnf-server", "识别到目标:" + new Gson().toJson(targets));
                 } catch (Exception e) {
@@ -68,9 +66,18 @@ public class DetectionMessageExecutor extends AbstractAsyncMessageExecutor {
     }
 
     private void saveResult(Bitmap bitmap, YoloV5Ncnn.Obj[] targets) {
-        try(FileOutputStream fos = new FileOutputStream(screenshotFileDir + "/dnf-server-detect.jpeg")) {
+        try(FileOutputStream fos = new FileOutputStream(screenshotFileDir + "/dnf-server-detect" + index + ".jpeg")) {
             Bitmap target = BitmapUtils.showObjects(bitmap, targets);
             target.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+        } catch (Exception e) {
+            Log.e("dnf-server", "生成截图文件异常: " + e.getLocalizedMessage());
+        }
+    }
+
+    private void saveOrigin(Bitmap bitmap) {
+        try(FileOutputStream fos = new FileOutputStream(screenshotFileDir + "/dnf-server" + index + ".jpeg")) {
+            Log.i("dnf-server", screenshotFileDir + "/dnf-server" + index + ".jpeg");
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, fos);
         } catch (Exception e) {
             Log.e("dnf-server", "生成截图文件异常: " + e.getLocalizedMessage());
         }

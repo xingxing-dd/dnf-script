@@ -1,16 +1,16 @@
 var socket = require("../common/socket")
-var levelIndex = 0
-var levelDirection = ["down", "right", "right", "above", "right", "right", "right"]
+var assistant = require("./assistant")
 
 var directin = null;
 
 var defaultPosition = {
     "whell": {topX: 170, topY: 705, bottomX: 475, bottomY: 1000},
-    attachBox: {x: 1690, y: 960}
+    attachBox: {x: 1620, y: 790}
 }
 
 var processing = false
 var intervalId
+var waitTimes = 0
 
 var findMaxProbItem = (items) =>  {
     if (!items || items.length == 0) {
@@ -29,175 +29,97 @@ var findMaxProbItem = (items) =>  {
     return maxProbItem;
 }
 var process = (targets) => {
-    var player = findMaxProbItem(targets["berserker"])
-    console.info("player>>>>>" + JSON.stringify(player))
-    if (!player) {
-        randomDirectionMove()
+    let initializationResult = assistant.initialization(targets)
+    if (!initializationResult) {
         return
     }
-    var directionGuidance = findMaxProbItem(targets["direction_guidance"])
-    console.info("directionGuidance>>>>>" + JSON.stringify(directionGuidance))
-    if (directionGuidance) {
-        directin = directionGuidance
-    }
-    var unblockedPortal = targets["unblocked_portal"]
-    var attachableMonsters = targets["attachable_monsters"]
-    console.info("unblockedPortal>>>>>" + JSON.stringify(unblockedPortal))
-    if ((!directin && !attachableMonsters) || (!directin && !unblockedPortal && !attachableMonsters)) {
-        randomDirectionMove()
+    let coward = assistant.suitableTarget(targets["berserker"])
+    console.info("定位【软蛋】坐标:" + JSON.stringify(coward) + "," + !coward)
+    if (!coward) {
+        randomAdjustCoward()
         return
     }
-    if (directionGuidance != null || (unblockedPortal != null && unblockedPortal.length > 0)) {
-        console.info("传送门解封，准备进入下一个关卡")
-        //传送门解封，准备进入下一个关卡
-        enterNext(player, unblockedPortal)
-        console.info("进入关卡完毕")
+    let monsters = targets["attachable_monsters"]
+    if (monsters) {
+        attachMonster(coward, monsters, targets["skill"])
         return
     }
-    if (!attachableMonsters) {
+    let rewards = targets["reward"]
+    if (rewards) {
+        pickupReward(coward, rewards)
         return
     }
-    attachMonsters(player, attachableMonsters)
-}
-
-var randomDirectionMove = () => {
-    console.info("未识别能找到移动参照物，随机朝一个方向移动，寻找参照物")
-    var randomPosition = getRandomDirection()
-    console.info("生成随机移动方向坐标:" + JSON.stringify(randomPosition))
-    var whellX = (defaultPosition["whell"]["topX"] + defaultPosition["whell"]["bottomX"]) / 2
-    var whellY = (defaultPosition["whell"]["topY"] + defaultPosition["whell"]["bottomY"]) / 2
-    press(Math.round(whellX + randomPosition.x),Math.round(whellY + randomPosition.y), 300)
-}
-
-var getRandomDirection = () => {  
-    // 生成1到8之间的随机数  
-    const direction = Math.floor(Math.random() * 8) + 1;  
-  
-    // 映射数组，按照你的描述定义  
-    const directions = [  
-        { x: 120, y: 0 },  
-        { x: 120, y: 120 },  
-        { x: 0, y: 120 },  
-        { x: -120, y: 120 },  
-        { x: -120, y: 0 },  
-        { x: -120, y: -120 },  
-        { x: 0, y: -120 },  
-        { x: 120, y: -120 }  
-    ];  
-  
-    // 返回对应方向的坐标  
-    return directions[direction - 1];  
-}  
-  
-var enterNext = (player, unblockedPortal) => {
-    console.info("传送门解封，准备进入下一个关卡:" + (directin == null || directin.x == null))
-    if (directin == null || directin.x == null) {
-        return
-    }
-    var result = null
-    if (unblockedPortal == null || unblockedPortal.length == 0) {
-        result = findClosestRect(player, [directin])
-        console.info("当前无解封传送门，前往路标指示处" + JSON.stringify(result))
-    } else {
-        result = findClosestRect(directin, unblockedPortal)
-        console.info("最近的传送门：" + JSON.stringify(result))
-        if (result.distance < 100) {
-            result = findClosestRect(player, unblockedPortal) 
+    var directionGuidance = assistant.suitableTarget(targets["direction_guidance"])
+    console.info("定位【路标】坐标:" + JSON.stringify(directionGuidance))
+    if (!directionGuidance) {
+        if (waitTimes > 5) {
+            randomAdjustCoward()
         } else {
-            result = findClosestRect(player, [directin])
-            console.info("当前识别最近传送门位置距离过远，前往路标指示处" + JSON.stringify(result))
+            waitTimes = waitTimes + 1
+        }
+        return
+    } 
+    waitTimes = 0
+    enterNext(coward, directionGuidance, targets["unblocked_portal"])
+}
+
+var randomAdjustCoward = () => {
+    let pressCoordinate = assistant.randomAdjust()
+    console.info("当前未识别到软蛋，生成随机移动操作坐标:" + JSON.stringify(pressCoordinate))
+    press(pressCoordinate.x, pressCoordinate.y, 600)
+}
+
+var attachMonster = (coward, monsters, skills) => {
+    let monster = assistant.findClosestTarget(coward, monsters)
+    console.info("定位到【软蛋与可攻击怪物】坐标等信息:" + JSON.stringify(monster))
+    if (!monster) {
+        return
+    }
+    let pressCoordinate = assistant.moveJudgment(monster)
+    console.info("生成攻击移动操作坐标:" + JSON.stringify(pressCoordinate))
+    press(pressCoordinate.x, pressCoordinate.y, Math.round(monster.distance * 0.5))
+    var attackSequence = assistant.attachJudgment(skills)
+    console.info("生成攻击序列:" + JSON.stringify(attackSequence))
+    for (var i in attackSequence) {
+        var action = attackSequence[i]
+        if (action.p) {
+            press(action.c.x, action.c.y, action.p)
+        } else {
+            click(action.c.x, action.c.y)
+        }
+        if (action.w) {
+            sleep(action.w)
         }
     }
-    var p = calculateYCoordinate(result.angle)
-    console.info("传送门解封，准备进入下一个关卡:" + JSON.stringify(p))
-    var whellX = (defaultPosition["whell"]["topX"] + defaultPosition["whell"]["bottomX"]) / 2
-    var whellY = (defaultPosition["whell"]["topY"] + defaultPosition["whell"]["bottomY"]) / 2
-    console.info("传送门解封，准备进入下一个关卡:" + Math.round(whellX + p.x) + "," + Math.round(whellY + p.y))
-    press(Math.round(whellX + p.x),Math.round(whellY +p.y), Math.round(result.distance))
 }
-/**
- * 攻击怪物
- */
-var attachMonsters = (player, attachableMonsters) => {
-    if (player == null || player.x == null || attachableMonsters == null) {
+var pickupReward = (coward, rewards) => {
+    let reward = assistant.findClosestTarget(coward, rewards)
+    console.info("定位到【软蛋与掉落物品】坐标等信息:" + JSON.stringify(reward))
+    if (!reward) {
         return
     }
-    console.log("开始寻怪进行攻击")
-    var result = findClosestRect(player, attachableMonsters)
-    console.info("最近的怪物：" + JSON.stringify(result))
-    var p = calculateYCoordinate(result.angle)
-    var whellX = (defaultPosition["whell"]["topX"] + defaultPosition["whell"]["bottomX"]) / 2
-    var whellY = (defaultPosition["whell"]["topY"] + defaultPosition["whell"]["bottomY"]) / 2
-    console.info("攻击最近的一个怪物:" + Math.round(whellX + p.x) + "," + Math.round(whellY + p.y - 30))
-    press(Math.round(whellX + p.x),Math.round(whellY + p.y), Math.round(result.distance *0.5))
-    press(defaultPosition.attachBox.x, defaultPosition.attachBox.y, 1000)
+    let pressCoordinate = assistant.moveJudgment(reward)
+    console.info("生成拾取掉落物品移动操作坐标:" + JSON.stringify(pressCoordinate))
+    press(pressCoordinate.x, pressCoordinate.y, Math.round(reward.distance))
 }
-var calculateYCoordinate = (angleInDegrees) => {
-    if (angleInDegrees == 0 || angleInDegrees == 360) {
-        return {x: 100, y: 0}
-    } else if (angleInDegrees == 90) {
-        return {x: 0, y: 100}
-    } else if (angleInDegrees == 180) {
-        return {x: -100, y: 0}
-    } else if (angleInDegrees == 270) {
-        return {x: 0, y: -100}
-    }
-    // 将角度从度转换为弧度
-    var angleInRadians = angleInDegrees * (Math.PI / 180);
-    if ((angleInDegrees > 0 && angleInDegrees <= 45) || angleInDegrees >= 315) {
-        return {x: 150, y: 150 * Math.tan(angleInRadians)}
-    } else if (angleInDegrees > 45 && angleInDegrees <= 135) {
-        return {x: 150 / Math.tan(angleInRadians), y: 150}
-    } else if (angleInDegrees > 135 && angleInDegrees <= 225) {
-        return {x: -150, y: -150 * Math.tan(angleInRadians)}
+var enterNext = (coward, directionGuidance, unblockedPortals) => {
+    console.info("地图清理完毕，前往传送门进入下一张地图")
+    let target = assistant.findClosestTarget(directionGuidance, unblockedPortals)
+    console.info("定位距离路标最近传送门："  + JSON.stringify(target))
+    if (!target || target.distance > 500) {
+        target = assistant.findClosestTarget(coward, [directionGuidance])
+        console.info("定位到【传送门】不存在或者偏离路标，直接前往路标指示处:" + JSON.stringify(target))
     } else {
-        return {x: -150 / Math.tan(angleInRadians), y: -150}
+        target = assistant.findClosestTarget(coward, [target.rect])
+        console.info("定位到【传送门】，直接前往传送门:" + JSON.stringify(target))
     }
+    let pressCoordinate = assistant.moveJudgment(target)
+    console.info("生成传送门移动操作坐标:" + JSON.stringify(pressCoordinate))
+    press(pressCoordinate.x, pressCoordinate.y, Math.round(target.distance) + 200)
+    recentGuidance = null
 }
 
-function distance(p1, p2) {       
-    return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));  
-}  
 
-function angle(p1, p2) {    
-    console.log("计算，p1:" + JSON.stringify(p1) + ",p2:" + JSON.stringify(p2))
-    const dx = p2.x - p1.x;    
-    const dy = p2.y - p1.y;    
-    const radAngle = Math.atan2(dy, dx);  // 计算弧度角度  
-    const degAngle = radAngle * (180 / Math.PI); // 转换为度  
-    // 如果需要，确保角度为正数  
-    return ((degAngle + 360) % 360); // 加360后取模，确保结果为正数  
-}  
-
-function calculateBottomCenter(rect) {  
-    return {  
-        x: rect.x + rect.w / 2,  
-        y: rect.y + rect.h  
-    };  
-}  
-
-function findClosestRect(target, rects) {  
-    let minDistance = Infinity;  
-    let closestRect = null;  
-    let closestAngle = 0;  
-
-    for (let rect of rects) {  
-        const bottomCenter = calculateBottomCenter(rect);  
-        const distanceToTarget = distance(target, bottomCenter);  
-
-        if (distanceToTarget < minDistance) {  
-            minDistance = distanceToTarget;  
-            closestRect = rect;  
-            const targetCenter = { x: target.x + target.w / 2, y: target.y + target.h - 20 };  
-            closestAngle = angle(targetCenter, bottomCenter);  
-        }   
-    }  
-    return {  
-        rect: closestRect,  
-        distance: minDistance,  
-        angle: closestAngle  
-    };  
-}  
 //打开游戏
 exports.open = () => {
     desc("地下城与勇士：起源").findOne().click()
@@ -221,24 +143,16 @@ exports.enter = () => {
 
 //开始玩游戏
 exports.start = () => {
-    // socket.send({
-    //     action: "detection"
-    // }, data => {
-    //     console.info(JSON.stringify(data))
-    //     if (!data || processing) {
-    //         return
-    //     }
-    //     processing = true
-    //     process(data.targets)
-    //     processing = false
-    // })
-    for(;;) {
+    if(intervalId) {
+        clearInterval(intervalId)
+    }
+    intervalId = setInterval(() => {
         if (processing) {
             return
         }
         processing = true
         socket.send({
-            action: "detection"
+            action: "screen-detect"
         }, data => {
             console.info(JSON.stringify(data))
             if (data && data.targets) {
@@ -246,8 +160,7 @@ exports.start = () => {
             }
             processing = false
         })
-        sleep(500)
-    }
+    }, 100)
 }
 
 exports.stop = () => {

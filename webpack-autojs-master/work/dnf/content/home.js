@@ -37,7 +37,7 @@ exports.display = () => {
             () => w.launch.setText("启动服务中..."),
             () => utils.startServer(),
             () => utils.loadContent("operator", w),
-            1500
+            800
         )
     })
     w.exit.click(() => {

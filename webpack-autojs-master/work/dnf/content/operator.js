@@ -1,10 +1,9 @@
-var utils = require("../common/utils")
-var server = require("../common/socket")
-var game = require("../game/game")
-var autoCloseTimer = null
-var executionStatus = false
-
 exports.display = () => {
+    var utils = require("../common/utils")
+    var socket = require("../common/socket")
+    var game = require("../game/game")
+    var autoCloseTimer = null
+    var executionStatus = false
     var w = floaty.window(
         <horizontal h="50sp">
             <img id="action_bar" w="38sp" h="38sp" padding="5sp" bg="#CCCCCC" src="file://./img/分类.png" alpha="0.5" radius="15sp"/>
@@ -45,13 +44,13 @@ exports.display = () => {
             () => {},
             () => {
                 if (!executionStatus) {
-                    server.connect()
+                    socket.connect()
                     executionStatus = true
-                    game.open()
-                    game.enter()
+                    // game.open()
+                    //game.enter()
                     game.start()
                 } else {
-                    server.close()
+                    game.stop()
                     executionStatus = false
                 }
             },
@@ -61,7 +60,21 @@ exports.display = () => {
                 } else {
                     w.execution.attr("src", "file://./img/播放.png")
                 }},
-            1500
+            200
+        )
+    })
+    w.setting.click(() => {
+        utils.async(
+            () => {},
+            () => {
+                socket.connect()
+                socket.send({
+                    action: "screen-ocr"
+                }, data => {
+                    console.info(JSON.stringify(data))
+                })
+            },
+            () => {}
         )
     })
     w.exitOnClose()

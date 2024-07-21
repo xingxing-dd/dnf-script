@@ -44,9 +44,11 @@ var createConnection = () => {
         },
         onClosing: function (webSocket, code, response) {
             print("正在关闭")
+            status = "closed"
         },
         onClosed: function (webSocket, code, response) {
             print("已关闭")
+            status = "closed"
         },
         onFailure: function (webSocket, t, response) {
             print(t)
