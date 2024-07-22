@@ -49,11 +49,11 @@ public class DetectionMessageExecutor extends AbstractAsyncMessageExecutor {
                     output.setRequestId(getRequestId());
                     output.setData(data);
                     connectionManager.send(output);
-                    if (targets != null && targets.length > 0) {
-                        saveResult(screenshot, targets);
-                        saveOrigin(screenshot);
-                        index = index + 1;
-                    }
+//                    if (targets != null && targets.length > 0) {
+//                        saveResult(screenshot, targets);
+//                        saveOrigin(screenshot);
+//                        index = index + 1;
+//                    }
                     Log.i("dnf-server", "识别到目标:" + new Gson().toJson(targets));
                 } catch (Exception e) {
                     Log.e("dnf-server", "生成截图文件异常: " + e.getLocalizedMessage());

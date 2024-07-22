@@ -63,11 +63,11 @@ public class DnfServerActivity extends ComponentActivity implements ActivityResu
     protected void onStart() {
         super.onStart();
         requestReadImagePermission();
-        DnfServerApplication application = (DnfServerApplication) getApplication();
-        if (application.isForegroundServiceRunning()) {
-            finishAffinity();
-            return;
-        }
+//        DnfServerApplication application = (DnfServerApplication) getApplication();
+//        if (application.isForegroundServiceRunning()) {
+//            finishAffinity();
+//            return;
+//        }
         MediaProjectionManager projectionManager = (MediaProjectionManager) getSystemService(Context.MEDIA_PROJECTION_SERVICE);
         // 发起屏幕捕获意图
         ActivityResultLauncher<Intent> startActivityForResult = registerForActivityResult(

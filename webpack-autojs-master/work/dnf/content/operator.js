@@ -1,6 +1,7 @@
 exports.display = () => {
     var utils = require("../common/utils")
     var socket = require("../common/socket")
+    var global = require("../common/global")
     var game = require("../game/game")
     var autoCloseTimer = null
     var executionStatus = false
@@ -47,7 +48,7 @@ exports.display = () => {
                     socket.connect()
                     executionStatus = true
                     // game.open()
-                    //game.enter()
+                    game.enter()
                     game.start()
                 } else {
                     game.stop()
@@ -64,18 +65,28 @@ exports.display = () => {
         )
     })
     w.setting.click(() => {
-        utils.async(
-            () => {},
-            () => {
-                socket.connect()
-                socket.send({
-                    action: "screen-ocr"
-                }, data => {
-                    console.info(JSON.stringify(data))
-                })
-            },
-            () => {}
-        )
+        global.addTask("screen-ocr", () => {
+            socket.connect()
+            socket.send({
+                action: "screen-ocr"
+            }, data => {
+                console.info(JSON.stringify(data))
+            })
+        }, 5000)
+        // utils.async(
+        //     () => {},
+        //     () => {
+        //         console.info(device.height)
+        //         click(device.height - 50, 50)
+        //         socket.connect()
+        //         socket.send({
+        //             action: "screen-ocr"
+        //         }, data => {
+        //             console.info(JSON.stringify(data))
+        //         })
+        //     },
+        //     () => {}
+        // )
     })
     w.exitOnClose()
     w.exit.click(() => {

@@ -127,18 +127,18 @@ exports.open = () => {
 
 //进入地图
 exports.enter = () => {
-    sleep(5000)
-    var whellX = (defaultPosition["whell"]["topX"] + defaultPosition["whell"]["bottomX"]) / 2
-    var whellY = (defaultPosition["whell"]["topY"] + defaultPosition["whell"]["bottomY"]) / 2
-    //进入地图
-    press(whellX - 120, whellY, 1000)
-    sleep(500)
-    //选择冒险级
-    click(185, 310)
-    sleep(500)
-    click(1430, 840)
-    sleep(500)
-    click(1620, 920)
+    // sleep(5000)
+    // var whellX = (defaultPosition["whell"]["topX"] + defaultPosition["whell"]["bottomX"]) / 2
+    // var whellY = (defaultPosition["whell"]["topY"] + defaultPosition["whell"]["bottomY"]) / 2
+    // //进入地图
+    // press(whellX - 120, whellY, 1000)
+    // sleep(500)
+    // //选择冒险级
+    // click(185, 310)
+    // sleep(500)
+    // click(1430, 840)
+    // sleep(500)
+    // click(1620, 920)
 }
 
 //开始玩游戏

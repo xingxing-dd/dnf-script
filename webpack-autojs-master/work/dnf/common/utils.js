@@ -59,3 +59,6 @@ exports.async = (before, task, after, delay) => {
         ui.post(after)
     });
 }
+exports.addTask = () => {
+    
+}
