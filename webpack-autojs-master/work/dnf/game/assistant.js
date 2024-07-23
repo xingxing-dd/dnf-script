@@ -58,7 +58,6 @@ var randomRockerCoordinate  = (angleInDegrees) => {
     }
 }
 var angle = (p1, p2) => {    
-    console.log("计算，p1:" + JSON.stringify(p1) + ",p2:" + JSON.stringify(p2))
     const dx = p2.x - p1.x;    
     const dy = p2.y - p1.y;    
     const radAngle = Math.atan2(dy, dx);  

@@ -1,7 +1,6 @@
 var utils = require("./common/utils")
 var global = require("./common/global")
 auto();
-events.observeNotification();
 //加载主页
 // utils.async(
 //     () => utils.loadView("loading"),
@@ -14,5 +13,5 @@ utils.loadContent("home")
 setInterval(global.execTask, 200)
 
 events.on('exit', () => {
-    java.lang.System.exit(0);
+    //java.lang.System.exit(0);
 })

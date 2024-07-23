@@ -28,7 +28,7 @@ public class  OcrMessageExecutor  extends AbstractAsyncMessageExecutor {
 
             @Override
             protected boolean process(Bitmap screenshot) {
-                DetectionAssistant.recognizer.process(screenshot, 0).addOnSuccessListener(new OnSuccessListener<Text>() {
+                DetectionAssistant.recognizer.process(screenshot, 90).addOnSuccessListener(new OnSuccessListener<Text>() {
                     @Override
                     public void onSuccess(Text text) {
                         Log.i("dnf-server", "识别到目标:" + text.getText());

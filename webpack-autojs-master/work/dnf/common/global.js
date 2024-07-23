@@ -15,17 +15,23 @@ exports.execTask = () => {
     for (var name in executors) {
         let executor = executors[name]
         let current = Date.now()
-        if (executor.next > current + executor.delay) {
+        if (executor.next > current) {
             continue
         }
-        threads.start(executor.task)
+        threads.start(() => {
+            if(executor.status != 'pening') {
+                return
+            }
+            executor.status = 'processing'
+            executor.task()
+            executor.status = 'pening'
+        })
         executor.next = current + executor.delay
     }
 }
 exports.removeTask = (name) => {
-    let executor = executors[name]
-    if (!executor) {
+    if (!executors[name]) {
         return
     }
-    delete executor
+    delete executors[name]
 }

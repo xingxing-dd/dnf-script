@@ -65,14 +65,6 @@ exports.display = () => {
         )
     })
     w.setting.click(() => {
-        global.addTask("screen-ocr", () => {
-            socket.connect()
-            socket.send({
-                action: "screen-ocr"
-            }, data => {
-                console.info(JSON.stringify(data))
-            })
-        }, 5000)
         // utils.async(
         //     () => {},
         //     () => {

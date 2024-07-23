@@ -27,7 +27,9 @@ var createConnection = () => {
             if (!obj) {
                 return
             }
-            callback[obj.requestId](obj.data)
+            if (callback[obj.requestId]) {
+                callback[obj.requestId](obj.data)
+            }
             console.info("是否需要执行返回ack:" + obj.requiredAck)
             if (obj.requiredAck) {
                 var ack = {
@@ -40,20 +42,26 @@ var createConnection = () => {
             if (obj.status == "processing") {
                 return
             }
+            if (!callback[obj.requestId]) {
+                return
+            }
             delete callback[obj.requestId]
         },
         onClosing: function (webSocket, code, response) {
             print("正在关闭")
             status = "closed"
+            socket == null
         },
         onClosed: function (webSocket, code, response) {
             print("已关闭")
             status = "closed"
+            socket == null
         },
         onFailure: function (webSocket, t, response) {
             print(t)
             ui.post(() => toast("服务端连接断开!"))
             status = "closed"
+            socket == null
         }
     }
     socket= client.newWebSocket(request, new WebSocketListener(listener))
@@ -85,6 +93,9 @@ exports.close = () => {
 }
 
 exports.send = (message, func) => {
+    if (socket == null) {
+        createConnection()
+    }
     var requestId = generateUUID()
     message.requestId = requestId
     callback[requestId] = func

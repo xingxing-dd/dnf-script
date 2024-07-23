@@ -1,33 +1,20 @@
 var socket = require("../common/socket")
 var assistant = require("./assistant")
+var enter = require("./action/enter")
 
-var directin = null;
-
-var defaultPosition = {
-    "whell": {topX: 170, topY: 705, bottomX: 475, bottomY: 1000},
-    attachBox: {x: 1620, y: 790}
-}
-
-var processing = false
-var intervalId
+/**
+ * 标记当前状态
+ */
+var action = enter.start()
 var waitTimes = 0
 
-var findMaxProbItem = (items) =>  {
-    if (!items || items.length == 0) {
-        return null
-    }
-    let maxProbItem = null;
-    let maxProb = -Infinity; // 初始化为负无穷大
 
-    for (let i = 0; i < items.length; i++) {
-        const item = items[i];
-        if (item.prob > maxProb) {
-            maxProb = item.prob;
-            maxProbItem = item;
-        }
-    }
-    return maxProbItem;
+
+
+var processOperation = () => {
+    
 }
+
 var process = (targets) => {
     let initializationResult = assistant.initialization(targets)
     if (!initializationResult) {
@@ -143,28 +130,71 @@ exports.enter = () => {
 
 //开始玩游戏
 exports.start = () => {
-    if(intervalId) {
-        clearInterval(intervalId)
-    }
-    intervalId = setInterval(() => {
-        if (processing) {
+    global.addTask("screen-detect", () => {
+        if (!action || action.name != "playing") {
             return
         }
-        processing = true
         socket.send({
             action: "screen-detect"
         }, data => {
-            console.info(JSON.stringify(data))
-            if (data && data.targets) {
-                process(data.targets)
+            if (!data || !data.targets) {
+                return
             }
-            processing = false
+            process(data.targets)
         })
-    }, 100)
+    }, 300)
+    global.addTask("screen-ocr", () => {
+        socket.send({
+            action: "screen-ocr"
+        }, data => {
+            console.info(JSON.stringify(data))
+            if (!data) {
+                return
+            }
+            for (var i = action.current; i < action.pipeline.length; i++) {
+                for (var j in action.pipeline[i]["labels"]) {
+                    for (var k in data.textBlocks) {
+                        if (data.textBlocks[k].text.includes(action.pipeline[i]["labels"][j])) {
+                            console.info("发现label:" + data.textBlocks[k].text + ",执行步骤为:" + i)
+                            sleep(1000)
+                            action.pipeline[i].action(data.textBlocks[k].box)
+                            action.current = i + 1
+                            if (action.current >= action.pipeline.length) {
+                                action = {
+                                    name: "playing",
+                                    pipeline: []
+                                }
+                            }
+                            return
+                        }
+                    }
+                }
+            }
+        })
+    }, 2000)
+
+    // if(intervalId) {
+    //     clearInterval(intervalId)
+    // }
+    // intervalId = setInterval(() => {
+    //     if (processing) {
+    //         return
+    //     }
+    //     processing = true
+    //     socket.send({
+    //         action: "screen-detect"
+    //     }, data => {
+    //         console.info(JSON.stringify(data))
+    //         if (data && data.targets) {
+    //             process(data.targets)
+    //         }
+    //         processing = false
+    //     })
+    // }, 100)
 }
 
 exports.stop = () => {
-    if(intervalId) {
-        clearInterval(intervalId)
-    }
+    global.removeTask("screen-ocr")
+    global.removeTask("screen-detect")
+    action = enter.start()
 }
