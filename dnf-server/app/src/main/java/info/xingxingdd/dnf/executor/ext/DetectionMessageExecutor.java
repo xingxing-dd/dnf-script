@@ -4,9 +4,7 @@ import android.graphics.Bitmap;
 import android.os.Environment;
 import android.util.Log;
 
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.gson.Gson;
-import com.google.mlkit.vision.text.Text;
 
 import java.io.FileOutputStream;
 import java.util.Arrays;

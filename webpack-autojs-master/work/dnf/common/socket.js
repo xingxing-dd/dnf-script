@@ -28,9 +28,9 @@ var createConnection = () => {
                 return
             }
             if (callback[obj.requestId]) {
-                callback[obj.requestId](obj.data)
+                callback[obj.requestId](obj.data, obj.status)
             }
-            console.info("是否需要执行返回ack:" + obj.requiredAck)
+            //console.info("是否需要执行返回ack:" + obj.requiredAck)
             if (obj.requiredAck) {
                 var ack = {
                     "action": "client-ack",

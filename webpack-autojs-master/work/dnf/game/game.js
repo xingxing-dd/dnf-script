@@ -5,15 +5,10 @@ var enter = require("./action/enter")
 /**
  * 标记当前状态
  */
-var action = enter.start()
+var action = enter.create()
+var processing = false
 var waitTimes = 0
 
-
-
-
-var processOperation = () => {
-    
-}
 
 var process = (targets) => {
     let initializationResult = assistant.initialization(targets)
@@ -130,48 +125,75 @@ exports.enter = () => {
 
 //开始玩游戏
 exports.start = () => {
-    global.addTask("screen-detect", () => {
-        if (!action || action.name != "playing") {
+    global.addTask("screen-detect", (before, after) => {
+        // if (!action || action.name != "playing") {
+        //     return
+        // }
+        if (processing) {
             return
         }
+        processing = true
         socket.send({
-            action: "screen-detect"
+            action: "screen-detect"  
         }, data => {
-            if (!data || !data.targets) {
-                return
+            if (data && data.targets) {
+                process(data.targets)
             }
-            process(data.targets)
-        })
-    }, 300)
-    global.addTask("screen-ocr", () => {
-        socket.send({
-            action: "screen-ocr"
-        }, data => {
-            console.info(JSON.stringify(data))
-            if (!data) {
-                return
-            }
-            for (var i = action.current; i < action.pipeline.length; i++) {
-                for (var j in action.pipeline[i]["labels"]) {
-                    for (var k in data.textBlocks) {
-                        if (data.textBlocks[k].text.includes(action.pipeline[i]["labels"][j])) {
-                            console.info("发现label:" + data.textBlocks[k].text + ",执行步骤为:" + i)
-                            sleep(1000)
-                            action.pipeline[i].action(data.textBlocks[k].box)
-                            action.current = i + 1
-                            if (action.current >= action.pipeline.length) {
-                                action = {
-                                    name: "playing",
-                                    pipeline: []
-                                }
-                            }
-                            return
-                        }
-                    }
-                }
-            }
+            processing = false
         })
     }, 2000)
+    // global.addTask("operate-detect", () => {
+    //     console.info(processing)
+    //     if (processing) {
+    //         return
+    //     }
+    //     processing = true
+    //     socket.send({
+    //         action: "operate-detect",
+    //         data: {
+    //             "target": action.next(),
+    //             "deviceId":"xingxingdd"
+    //         }
+    //     }, (data, status) => {
+    //         console.info("识别结果:" + JSON.stringify(data))
+    //         if (data && data.result) {
+    //             action.process(data.result)
+    //         }
+    //         if (status == "success") {
+    //             processing=false
+    //         }
+    //     })
+    // }, 1000)
+    // global.addTask("screen-ocr", (before, after) => {
+    //     before()
+    //     socket.send({
+    //         action: "screen-ocr"
+    //     }, data => {
+    //         console.info(JSON.stringify(data))
+    //         if (data) {
+    //             for (var i = action.current; i < action.pipeline.length; i++) {
+    //                 for (var j in action.pipeline[i]["labels"]) {
+    //                     for (var k in data.textBlocks) {
+    //                         if (data.textBlocks[k].text.includes(action.pipeline[i]["labels"][j])) {
+    //                             console.info("发现label:" + data.textBlocks[k].text + ",执行步骤为:" + i)
+    //                             sleep(1000)
+    //                             action.pipeline[i].action(data.textBlocks[k].box)
+    //                             action.current = i + 1
+    //                             if (action.current >= action.pipeline.length) {
+    //                                 action = {
+    //                                     name: "playing",
+    //                                     pipeline: []
+    //                                 }
+    //                             }
+    //                             return
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //         after()
+    //     })
+    // }, 2000)
 
     // if(intervalId) {
     //     clearInterval(intervalId)
@@ -194,7 +216,7 @@ exports.start = () => {
 }
 
 exports.stop = () => {
-    global.removeTask("screen-ocr")
+    global.removeTask("operate-detect")
     global.removeTask("screen-detect")
-    action = enter.start()
+    action = enter.create()
 }

@@ -1,7 +1,7 @@
-let img = images.read("./xframe_000245.jpg")
-importClass(com.googlecode.tesseract.android.TessBaseAPI)
+let img = images.read("./binary_image.png")
+//importClass(com.googlecode.tesseract.android.TessBaseAPI)
 //新建OCR实例
-var tessocr = new TessBaseAPI()
+//var tessocr = new TessBaseAPI()
 // 新增：自定义模型路径(必须是绝对路径), files.path() 将相对路径转为绝对路径
 let myModelPath = files.path("./models");
 let start = new Date()
@@ -9,13 +9,9 @@ let start = new Date()
 let result = gmlkit.ocr(img, "zh")
 log('OCR识别耗时：' + (new Date() - start) + 'ms')
 toastLog("完整识别信息: " + JSON.stringify(result))
-start = new Date()
-// 识别图片中的文字，只返回文本识别信息（字符串列表）。当前版本可能存在文字顺序错乱的问题 建议先使用detect后自行排序
-const stringList = paddle.ocrText(img, myModelPath)
-log('OCR纯文本识别耗时：' + (new Date() - start) + 'ms')
-toastLog("文本识别信息: " + JSON.stringify(stringList))
+//toastLog("文本识别信息: " + JSON.stringify(stringList))
 
 // 回收图片
-img.recycle()
+//img.recycle()
 // 释放native内存，非必要，供万一出现内存泄露时使用
 // paddle.release()

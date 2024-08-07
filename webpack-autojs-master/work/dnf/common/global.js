@@ -18,14 +18,10 @@ exports.execTask = () => {
         if (executor.next > current) {
             continue
         }
-        threads.start(() => {
-            if(executor.status != 'pening') {
-                return
-            }
-            executor.status = 'processing'
-            executor.task()
-            executor.status = 'pening'
-        })
+        if(executor.status != 'pening') {
+            continue
+        } 
+        executor.task()
         executor.next = current + executor.delay
     }
 }

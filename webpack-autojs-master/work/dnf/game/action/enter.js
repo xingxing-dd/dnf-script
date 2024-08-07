@@ -1,48 +1,65 @@
-const pipeline = [
-    {
-        labels:["冒险"],
-        action: (box) => click(box.left + 5, box.bottom - 5)
-    },  
-    {
-        labels:["奖励"],
-        action: (box) => click(box.left + 5, box.bottom - 5)
-    },    
-    {
-        labels:["冒险圾"],
-        action: (box) => click(box.left + 50, box.bottom - 50)
-    },   
-    {
-        labels:["万年","雪山", "万午"],
-        action: (box) => click(box.left + 10, box.bottom - 10)
-    },   
-    {
-        labels:["区域移动"],
-        action: (box) => {
-            console.info((box.left + 5) + "," + (box.bottom - 5))
-            click(box.left + 5, box.bottom - 5)
+function action(){
+    this.name = "enter"
+    this.current = 0
+    this.pipeline = [
+        {
+            target: "1",
+            desc: "世界地图图标"
+        },  
+        {
+            target: "2",
+            desc: "世界地图按钮"
+        },    
+        {
+            target: "3",
+            desc: "世界地图-阿拉德大陆"
+        },   
+        {
+            target: "4",
+            desc: "阿拉德大陆-贝尔玛尔公国北部"
+        },   
+        {
+            target: "5",
+            desc: "阿拉德大陆-贝尔玛尔北部",
+        },   
+        {
+            target: "6",
+            desc: "万年雪山",
+            action: (box) => {}
+        },   
+        {
+            target: "7",
+            desc: "冒险级按钮"
+        },  
+        {
+            target: "8",
+            desc: "布万家修炼场"
+        },  
+        // {
+        //     target: "9",
+        //     desc: "开始战斗"
+        // }
+    ]
+    this.process = (data) => {
+        var result = JSON.parse(data)
+        if (!result.position || result.position.x < 0 || result.position.y < 0) {
+            return
         }
-    },   
-    {
-        labels:["布万加"],
-        action: (box) => {}
-    },   
-    {
-        labels:["冒险"],
-        action: (box) => click(box.left + 5, box.bottom - 5)
-    },  
-    {
-        labels:["布万加"],
-        action: (box) => click(box.left + 20, box.bottom - 10)
-    },  
-    {
-        labels:["战斗开始"],
-        action: (box) => click(box.left + 20, box.bottom - 10)
+        if (!this.current) {
+            this.current = 0
+        }
+        var action =this.pipeline[this.current].action
+        if (!action) {
+            click(result.position.x + result.position.width / 2, result.position.y + result.position.height / 2)
+        } else {
+            action(result.position)
+        }
+        this.current++
     }
-]
-exports.start = () => {
-    return {
-        name: "enter",
-        current: 0,
-        pipeline: pipeline
+    this.next = () => {
+        return this.pipeline[this.current].target
     }
+}
+exports.create = () => {
+    return new action()
 }

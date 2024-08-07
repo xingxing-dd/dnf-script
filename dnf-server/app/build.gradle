@@ -35,12 +35,7 @@ dependencies {
     implementation libs.appcompat
     implementation libs.material
     implementation libs.java.websocket
-    testImplementation libs.junit
-    androidTestImplementation libs.ext.junit
-    androidTestImplementation libs.espresso.core
     implementation libs.gson
-    implementation libs.bus
-    implementation libs.text.recognition.chinese
 
     implementation(fileTree("libs"))
 }

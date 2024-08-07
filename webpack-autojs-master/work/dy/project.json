@@ -1,0 +1,13 @@
+{
+    "name": "抖音采集",
+    "main": "main.js",
+    "ignore": [
+        "build"
+    ],
+    "launchConfig": {
+        "hideLogs": true
+    },
+    "packageName": "com.test.dy",
+    "versionName": "1.0.0",
+    "versionCode": 5
+}

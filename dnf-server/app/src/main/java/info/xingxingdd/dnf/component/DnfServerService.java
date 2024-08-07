@@ -7,8 +7,6 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.media.projection.MediaProjection;
-import android.media.projection.MediaProjectionManager;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
@@ -17,8 +15,6 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
-
-import com.mcxiaoke.bus.Bus;
 
 import java.net.InetSocketAddress;
 import java.util.Arrays;
@@ -117,8 +113,6 @@ public class   DnfServerService extends Service {
             this.startScreenCaptureService(intent);
             //初始化模型
             DetectionAssistant.initDetectionEngine(this);
-            //初始化消息总线
-            Bus.getDefault().register(this);
         } catch (Exception e) {
             Toast.makeText(this, "打开服务失败:" + Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).collect(Collectors.joining(",")), Toast.LENGTH_LONG).show();
         }
@@ -136,8 +130,6 @@ public class   DnfServerService extends Service {
             ScreenCapture.getInstance().stop();
             //取消广播注册
             unregisterReceiver(broadcastReceiver);
-            //取消消息总线注册
-            Bus.getDefault().unregister(this);
         } catch (InterruptedException e) {
             Log.e("dnf-server", "websocket关闭失败", e);
         }
