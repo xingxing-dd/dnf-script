@@ -8,7 +8,7 @@ var enter = require("./action/enter")
 var action = enter.create()
 var processing = false
 var waitTimes = 0
-
+var w
 
 var process = (targets) => {
     let initializationResult = assistant.initialization(targets)
@@ -101,7 +101,6 @@ var enterNext = (coward, directionGuidance, unblockedPortals) => {
     recentGuidance = null
 }
 
-
 //打开游戏
 exports.open = () => {
     desc("地下城与勇士：起源").findOne().click()
@@ -125,45 +124,56 @@ exports.enter = () => {
 
 //开始玩游戏
 exports.start = () => {
-    global.addTask("screen-detect", (before, after) => {
-        // if (!action || action.name != "playing") {
-        //     return
-        // }
+    w = floaty.rawWindow(
+        <canvas id="borad" w="*" h="*"></canvas>
+    );
+    w.setSize(-1, -1);
+    w.setTouchable(false);
+    global.addTask("operate-detect", () => {
+        console.info(processing)
         if (processing) {
+            return
+        }
+        var next = action.next()
+        if (!next) {
+            global.removeTask("operate-detect")
+            global.addTask("screen-detect", (before, after) => {
+                if (processing) {
+                    return
+                }
+                processing = true
+                socket.send({
+                    action: "screen-detect"  
+                }, (data, status) => {
+                    if (data && data.targets) {
+                        process(data.targets)
+                        w.borad.on("draw", function(canvas) {
+                            canvas.drawRect(0, 0, 100, 100, paint);
+                        })
+                    }
+                    if (status == "success") {
+                        processing=false
+                    }
+                })
+            }, 2000)
             return
         }
         processing = true
         socket.send({
-            action: "screen-detect"  
-        }, data => {
-            if (data && data.targets) {
-                process(data.targets)
+            action: "operate-detect",
+            data: {
+                "operation": action.next()
             }
-            processing = false
+        }, (data, status) => {
+            console.info("识别结果:" + JSON.stringify(data))
+            if (data && data.result) {
+                action.process(data.result)
+            }
+            if (status == "success") {
+                processing=false
+            }
         })
-    }, 2000)
-    // global.addTask("operate-detect", () => {
-    //     console.info(processing)
-    //     if (processing) {
-    //         return
-    //     }
-    //     processing = true
-    //     socket.send({
-    //         action: "operate-detect",
-    //         data: {
-    //             "target": action.next(),
-    //             "deviceId":"xingxingdd"
-    //         }
-    //     }, (data, status) => {
-    //         console.info("识别结果:" + JSON.stringify(data))
-    //         if (data && data.result) {
-    //             action.process(data.result)
-    //         }
-    //         if (status == "success") {
-    //             processing=false
-    //         }
-    //     })
-    // }, 1000)
+    }, 500)
     // global.addTask("screen-ocr", (before, after) => {
     //     before()
     //     socket.send({
@@ -219,4 +229,5 @@ exports.stop = () => {
     global.removeTask("operate-detect")
     global.removeTask("screen-detect")
     action = enter.create()
+    w.close()
 }
