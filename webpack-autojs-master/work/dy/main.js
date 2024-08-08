@@ -1,3 +1,4 @@
+
 "ui";
 ui.layout(
     <vertical>
@@ -39,18 +40,52 @@ var search = (keyword) => {
         console.info("为空")
         return
     }
+    sleep(2000)
     var img = captureScreen()
     let result = gmlkit.ocr(img, "zh");
     log(result.text)
 }
 var process= (keyword) => {
-    desc("抖音").findOne().click()
+    text("抖音").findOne().click()
     search(keyword)
 }
 ui.start.click(function() {
+    if (!requestScreenCapture()) {
+        exit()
+    }
     var keyword = ui.keyword.getText()
     home()
     threads.start(function(){
         process(keyword)
     });
 })
+// var w = floaty.window(
+//     <vertical layout_gravity="center" w="auto" h="auto" bg="#FFFFFF" padding="20">
+//         <text text="抖音数据采集V1.0" gravity="center" textColor="red"/>
+//         <horizontal>
+//              <text textSize="16sp" textColor="black" layout_weight="1" text="搜索"/>
+//              <input id="keyword" hint="请输入搜索关键词" layout_weight="3"/>
+//          </horizontal>
+//          <horizontal>
+//              <text textSize="16sp" textColor="black" layout_weight="1" text="目录"/>
+//              <text id="filepath" hint="请输入数据保存目录" layout_weight="3" lines ="1" ellipsize="end"/>
+//          </horizontal>
+//          <button id="start" text="开始采集"/>
+//         <button id="exit" text="退出"/>
+//     </vertical>
+// );
+// w.filepath.setText(files.getSdcardPath() + "/" + new Date().getTime() + ".csv")
+// w.setSize(-2, -2);
+// w.start.click(() => {
+//     var float = require("./float")
+//     if (!requestScreenCapture()) {
+//         toast('请求截图权限失败')
+//         return
+//     }
+//     float.show()
+//     w.close()
+// })
+// w.exit.click(() => {
+//     w.close()
+// })
+// setInterval(() => {}, 100000)

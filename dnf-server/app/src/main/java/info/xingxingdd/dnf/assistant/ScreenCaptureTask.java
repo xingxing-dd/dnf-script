@@ -3,11 +3,15 @@ package info.xingxingdd.dnf.assistant;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 public abstract class ScreenCaptureTask implements Callable<Boolean> {
 
     private final String requestId;
+
+    private final Map<String, Object> data;
 
     private final long interval;
 
@@ -17,12 +21,21 @@ public abstract class ScreenCaptureTask implements Callable<Boolean> {
 
     public ScreenCaptureTask(String requestId) {
         this.interval = 2000;
+        this.data = new HashMap<>();
         this.nextTime = System.currentTimeMillis();
         this.requestId = requestId;
     }
 
+    public ScreenCaptureTask(String requestId, Map<String, Object> data) {
+        this.interval = 2000;
+        this.requestId = requestId;
+        this.data = data;
+        this.nextTime = System.currentTimeMillis();
+    }
+
     public ScreenCaptureTask(String requestId, long interval) {
         this.interval = interval;
+        this.data = new HashMap<>();
         this.nextTime = System.currentTimeMillis();
         this.requestId = requestId;
     }
@@ -56,5 +69,9 @@ public abstract class ScreenCaptureTask implements Callable<Boolean> {
 
     public long getInterval() {
         return interval;
+    }
+
+    public Map<String, Object> getData() {
+        return this.data;
     }
 }
