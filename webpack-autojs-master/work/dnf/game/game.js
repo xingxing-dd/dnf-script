@@ -8,7 +8,8 @@ var enter = require("./action/enter")
 var action = enter.create()
 var processing = false
 var waitTimes = 0
-var w
+var debugWindow
+var rect
 
 var process = (targets) => {
     let initializationResult = assistant.initialization(targets)
@@ -124,11 +125,23 @@ exports.enter = () => {
 
 //开始玩游戏
 exports.start = () => {
-    w = floaty.rawWindow(
+    debugWindow = floaty.rawWindow(
         <canvas id="borad" w="*" h="*"></canvas>
-    );
-    w.setSize(-1, -1);
-    w.setTouchable(false);
+    )
+    debugWindow.setSize(-1, -1)
+    debugWindow.setTouchable(false)
+    var paint = new Paint()
+    //设置画笔颜色为红色
+    paint.setStyle(android.graphics.Paint.Style.STROKE)
+    paint.setColor(colors.RED)
+    paint.setStrokeWidth(5)
+    debugWindow.borad.on("draw", function(canvas) {
+        canvas.drawColor(0xFFFFFF, android.graphics.PorterDuff.Mode.CLEAR)
+        if (!rect) {
+            return
+        }
+        canvas.drawRect(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height, paint);
+    })
     global.addTask("operate-detect", () => {
         console.info(processing)
         if (processing) {
@@ -147,9 +160,6 @@ exports.start = () => {
                 }, (data, status) => {
                     if (data && data.targets) {
                         process(data.targets)
-                        w.borad.on("draw", function(canvas) {
-                            canvas.drawRect(0, 0, 100, 100, paint);
-                        })
                     }
                     if (status == "success") {
                         processing=false
@@ -167,6 +177,7 @@ exports.start = () => {
         }, (data, status) => {
             console.info("识别结果:" + JSON.stringify(data))
             if (data && data.result) {
+                rect = data.result
                 action.process(data.result)
             }
             if (status == "success") {
@@ -229,5 +240,5 @@ exports.stop = () => {
     global.removeTask("operate-detect")
     global.removeTask("screen-detect")
     action = enter.create()
-    w.close()
+    debugWindow.close()
 }

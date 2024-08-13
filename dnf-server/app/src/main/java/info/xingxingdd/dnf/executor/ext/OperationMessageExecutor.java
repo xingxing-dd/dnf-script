@@ -10,7 +10,8 @@ import android.util.Log;
 import com.google.gson.Gson;
 
 import org.opencv.core.Rect;
-import org.opencv.matcher.MatcherTemplate;
+import org.opencv.matcher.MatchResult;
+import org.opencv.matcher.MatchTemplate;
 import org.opencv.matcher.TemplateMatcher;
 
 import java.io.FileOutputStream;
@@ -55,25 +56,21 @@ public class OperationMessageExecutor extends AbstractAsyncMessageExecutor {
             @Override
             protected boolean process(Bitmap screenshot) {
                 try {
-                    Log.i("dnf-server", "开始:" + new Gson().toJson(getData()));
-                    MatcherTemplate target = new MatcherTemplate(Objects.requireNonNull(DetectionAssistant.readBitmap((String) getData().get("operation") + ".png")));
-                    Log.i("dnf-server", "开始:1");
-                    MatcherTemplate source = new MatcherTemplate(screenshot);
-                    Log.i("dnf-server", "开始:2");
+                    MatchTemplate target = new MatchTemplate(Objects.requireNonNull(DetectionAssistant.readBitmap((String) getData().get("operation") + ".png")));
+                    MatchTemplate source = new MatchTemplate(screenshot);
                     int index = Integer.valueOf((String) getData().get("operation"));
                     List<Float> f = positions.get(index - 1);
                     source.setLeft((int) (screenshot.getWidth() * f.get(0)));
                     source.setRight((int) (screenshot.getWidth() * f.get(1)));
                     source.setTop((int) (screenshot.getHeight() * f.get(2)));
                     source.setBottom((int) (screenshot.getHeight() * f.get(3)));
-                    Log.i("dnf-server", "开始:" + new Gson().toJson(source));
-                    Rect rect = TemplateMatcher.match(target, source, 0.6f);
-                    Log.i("dnf-server", "识别到目标:" + new Gson().toJson(rect));
-                    //saveResult(screenshot, rect);
+                    MatchResult matchResult = TemplateMatcher.match(target, source, 0.6f);
+                    Log.i("dnf-server", "识别到目标:" + new Gson().toJson(matchResult));
+                    //saveResult(screenshot, matchResult);
                     Output output = Output.success();
                     output.setRequestId(getRequestId());
                     Map<String, Object> data = new HashMap<>();
-                    data.put("result", rect);
+                    data.put("result", matchResult);
                     output.setData(data);
                     connectionManager.send(output);
                 } catch (Exception e) {

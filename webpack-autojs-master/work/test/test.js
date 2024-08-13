@@ -90,27 +90,41 @@
 //         w.close();
 //     }, 2000);
 // })
-var w = floaty.rawWindow(
-    <canvas id="borad" w="*" h="*"></canvas>
-);
+// var w = floaty.rawWindow(
+//     <canvas id="borad" w="*" h="*"></canvas>
+// );
 
-w.setSize(-1, -1);
-w.setTouchable(false);
-setTimeout(()=>{
-    w.close();
-}, 10000);
-var x = 0
-var y = 0
-var paint = new Paint();
-//设置画笔颜色为红色
-paint.setColor(colors.RED);
-//绘制一个从坐标(0, 0)到坐标(100, 100)的正方形
-w.borad.on("draw", function(canvas) {
-    canvas.drawColor(colors.parseColor("#00ffffff"));
-    canvas.drawRect(x, y, x+100, x+100, paint);
-})
-for (var i = 0; i < 10; i++) {
-    sleep(500)
-    x = x + 100
-    y = y + 100
+// w.setSize(-1, -1);
+// w.setTouchable(false);
+// setTimeout(()=>{
+//     w.close();
+// }, 10000);
+// var x = 0
+// var y = 0
+// var paint = new Paint();
+// //设置画笔颜色为红色
+// paint.setStyle(android.graphics.Paint.Style.STROKE);
+// paint.setColor(colors.RED);
+// paint.setStrokeWidth(5);
+// //绘制一个从坐标(0, 0)到坐标(100, 100)的正方形
+// w.borad.on("draw", function(canvas) {
+//     canvas.drawColor(0xFFFFFF, android.graphics.PorterDuff.Mode.CLEAR)
+//     canvas.drawRect(x, y, x+100, x+100, paint);
+// })
+// for (var i = 0; i < 10; i++) {
+//     sleep(500)
+//     x = x + 100
+//     y = y + 100
+// }
+var Obj = function(age) {
+    return {
+        age: age,
+        setAge: function(t){
+            this.age = t
+        }
+    }
 }
+var obj = new Obj(2)
+console.info(obj.age)
+obj.setAge(10)
+console.info(obj.age)

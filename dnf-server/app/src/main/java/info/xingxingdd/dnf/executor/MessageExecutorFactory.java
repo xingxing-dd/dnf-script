@@ -12,7 +12,7 @@ public class MessageExecutorFactory {
     private static final Map<String, MessageExecutor> executors = new HashMap<>(16);
 
     static {
-        executors.put("operate-detect", new OperationMessageExecutor());
+        executors.put("screen-match", new OperationMessageExecutor());
         executors.put("screenshot", new ScreenshotMessageExecutor());
         executors.put("screen-detect", new DetectionMessageExecutor());
     }

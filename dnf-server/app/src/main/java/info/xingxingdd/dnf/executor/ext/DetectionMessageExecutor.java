@@ -27,8 +27,6 @@ public class DetectionMessageExecutor extends AbstractAsyncMessageExecutor {
 
     private final String screenshotFileDir = Environment.getExternalStorageDirectory().getAbsolutePath();
 
-    //"berserker", "unattachable_monsters", "attachable_monsters", "blocked_portal",
-    //            "unblocked_portal", "direction_guidance"
 
     @Override
     protected void doAsyncProcess(Input input) {

@@ -1,3 +1,5 @@
+var utils = require("../common/utils")
+var { initEngine } = require("../game/engine")
 exports.display = () => {
     var w = floaty.window(
         <vertical layout_gravity="center" w="auto" h="auto" bg="#FFFFFF" padding="20">
@@ -32,12 +34,14 @@ exports.display = () => {
     );
     w.setSize(-1, -1);
     w.launch.click(() => {
-        var utils = require("../common/utils")
         utils.async(
-            () => w.launch.setText("启动服务中..."),
+            () => {
+                w.launch.setText("启动服务中...")
+                initEngine("debug")
+            },
             () => utils.startServer(),
             () => utils.loadContent("operator", w),
-            800
+            500
         )
     })
     w.exit.click(() => {
