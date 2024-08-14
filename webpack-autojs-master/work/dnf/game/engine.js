@@ -1,15 +1,56 @@
 const runtime = require("./runtime")
 
+const ScriptExecutor = function(execute, depend, delay, sync) {
+    this.execute = execute,
+    this.depend = depend,
+    this.delay = delay,
+    this.sync = sync == undefined ? true : sync,
+    this.next = Date.now(),
+    this.run = function(context) {
+        let current = Date.now()
+        console.info(current)
+        if (this.next > current) {
+            return
+        }
+        let result = this.execute(this.after)
+        if (!result) {
+            this.next = current + this.delay
+        } else {
+            this.next = -1
+        }
+    },
+    this.completed = function() {
+        return !this || this.next == -1
+    }
+}
+
 const ScriptEngine = function(model) {
     this.status = "running",
+    this.pipelines = {}
+    this.executors = {},
     this.runtime = runtime.instance(model),
-    this.submit = function(name, execute, delay, sync) {
-        console.info(this.runtime.tasks)
-        this.runtime.tasks[name] = {
+    this.submit = function(flowId, name, execute, depend, delay, sync) {
+        if (!this.pipelines[flowId]) {
+            this.pipelines[flowId] = {
+                _context: {}
+            }
+        }
+        if (this.pipelines[flowId][name]) {
+            return
+        }
+        this.pipelines[flowId][name] = new ScriptExecutor(
+            execute, 
+            delay, 
+            delay, 
+            sync
+        )
+        this.executors[name] = {
+            flowId: flowId,
             status: "pending",
             execute: execute,
-            sync: sync == undefined ? true : sync,
+            depend: depend,
             delay: delay,
+            sync: sync == undefined ? true : sync,
             next: Date.now(),
             before: function() {
                 this.status = "processing"
@@ -24,30 +65,57 @@ const ScriptEngine = function(model) {
                     return
                 }
                 this.before()
-                this.execute(this.after)
+                let result = this.execute(this.after)
                 if (this.sync) {
                     this.after()
                 }
-                this.next = current + this.delay
+                if (!result) {
+                    this.next = current + this.delay
+                } else {
+                    this.next = -1
+                }
+            },
+            completed: function() {
+                return !this || this.next == -1
             }
         }
     },
-    this.remove = function(name) {
-        if (!this.runtime.tasks[name]) {
+    this.remove = function(flowId, name) {
+        if (!this.pipelines[flowId] || !this.pipelines[flowId][name]) {
             return
         }
-        delete this.runtime.tasks[name]
+        delete this.pipelines[flowId][name]
     },
     this.boot = function() {
         if (this.status == "running") {
-            for (let name in this.runtime.tasks) {
-                const task = this.runtime.tasks[name]
-                if (!task) {
-                    return
+            for (let flowId in this.pipelines) {
+                const pipeline = this.pipelines[flowId]
+                if (!pipeline || pipeline.completed()) {
+                    continue
                 }
-                task.run()
+                const context = pipeline[_context]
+                for(let name in pipeline[flowId]) {
+                    const executor = pipeline[name]
+                    if (executor.completed()) {
+                        this.remove(flowId, name)
+                    } else {
+                        executor.run(context)
+                    }
+                }
             }
         }  
+    },
+    this.completed = function(flowId, name) {
+        if (!this.pipelines[flowId] || !this.pipelines[flowId][name] || this.pipelines[flowId][name].completed()) {
+            return true
+        }
+        for(let name in this.pipelines[flowId]) {
+            const task = this.pipelines[flowId][name]
+            if (!task.completed()) {
+                return false
+            }
+        }
+        return true
     },
     this.start = function() {
         this.status = "running"
@@ -65,7 +133,7 @@ exports.initEngine = (model) => {
         console.info("初始化")
         scriptEngine = new ScriptEngine(model)
     }
-    console.info("获取：" + JSON.stringify(scriptEngine.runtime.tasks))
+    console.info("获取：" + JSON.stringify(scriptEngine.tasks))
     return scriptEngine
 }
 

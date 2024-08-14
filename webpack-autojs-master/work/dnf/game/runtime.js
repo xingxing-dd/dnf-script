@@ -1,5 +1,6 @@
 const Runtime = function(m) {
     this.model = m,
+    this.context = {},
     this.tasks = {},
     this.objs = {}
 }

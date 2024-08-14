@@ -7,7 +7,7 @@ exports.task = () => {
         if (!data || !data.result) {
             return
         }
-        process(data.targets)
+        //process(data.targets)
         processing=false
     })
 }

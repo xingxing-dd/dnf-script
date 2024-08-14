@@ -3,6 +3,7 @@ exports.display = () => {
     var socket = require("../common/socket")
     var global = require("../common/global")
     var game = require("../game/game")
+    var { acquireEngine }   = require("../game/engine")
     var autoCloseTimer = null
     var executionStatus = false
     var w = floaty.window(
@@ -50,6 +51,7 @@ exports.display = () => {
                     // game.open()
                     game.enter()
                     game.start()
+                    acquireEngine().submit()
                 } else {
                     game.stop()
                     executionStatus = false
