@@ -44,41 +44,41 @@ const ScriptEngine = function(model) {
             delay, 
             sync
         )
-        this.executors[name] = {
-            flowId: flowId,
-            status: "pending",
-            execute: execute,
-            depend: depend,
-            delay: delay,
-            sync: sync == undefined ? true : sync,
-            next: Date.now(),
-            before: function() {
-                this.status = "processing"
-            },
-            after: function() {
-                this.status = "pending"
-            },
-            run: function() {
-                let current = Date.now()
-                console.info(current)
-                if (this.next > current) {
-                    return
-                }
-                this.before()
-                let result = this.execute(this.after)
-                if (this.sync) {
-                    this.after()
-                }
-                if (!result) {
-                    this.next = current + this.delay
-                } else {
-                    this.next = -1
-                }
-            },
-            completed: function() {
-                return !this || this.next == -1
-            }
-        }
+        // this.executors[name] = {
+        //     flowId: flowId,
+        //     status: "pending",
+        //     execute: execute,
+        //     depend: depend,
+        //     delay: delay,
+        //     sync: sync == undefined ? true : sync,
+        //     next: Date.now(),
+        //     before: function() {
+        //         this.status = "processing"
+        //     },
+        //     after: function() {
+        //         this.status = "pending"
+        //     },
+        //     run: function() {
+        //         let current = Date.now()
+        //         console.info(current)
+        //         if (this.next > current) {
+        //             return
+        //         }
+        //         this.before()
+        //         let result = this.execute(this.after)
+        //         if (this.sync) {
+        //             this.after()
+        //         }
+        //         if (!result) {
+        //             this.next = current + this.delay
+        //         } else {
+        //             this.next = -1
+        //         }
+        //     },
+        //     completed: function() {
+        //         return !this || this.next == -1
+        //     }
+        // }
     },
     this.remove = function(flowId, name) {
         if (!this.pipelines[flowId] || !this.pipelines[flowId][name]) {
@@ -90,16 +90,17 @@ const ScriptEngine = function(model) {
         if (this.status == "running") {
             for (let flowId in this.pipelines) {
                 const pipeline = this.pipelines[flowId]
-                if (!pipeline || pipeline.completed()) {
+                if (pipeline.completed()) {
+                    delete this.pipelines[flowId]
                     continue
                 }
                 const context = pipeline[_context]
                 for(let name in pipeline[flowId]) {
                     const executor = pipeline[name]
-                    if (executor.completed()) {
-                        this.remove(flowId, name)
-                    } else {
-                        executor.run(context)
+                    //当前未执行完毕，并且依赖任务不存在或者执行完成
+                    if (!executor.completed() && (!executor.depend || executor.depend.completed())) {
+                        //多线程执行任务
+                        threads.start(() => executor.run(context))
                     }
                 }
             }
