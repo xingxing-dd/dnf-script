@@ -46,14 +46,32 @@ exports.display = () => {
             () => {},
             () => {
                 if (!executionStatus) {
-                    socket.connect()
+                    //socket.connect()
                     executionStatus = true
                     // game.open()
-                    game.enter()
-                    game.start()
-                    acquireEngine().submit()
+                    //game.enter()
+                    //game.start()
+                    acquireEngine().submit("111", "test1", (context) => {
+                        console.info("获取到结果:" + context["count"])
+                        return context["count"] >= 5
+                    }, "test2", 1000)
+                    acquireEngine().submit("111", "test2", (context) => {
+                        let count = context["count"]
+                        if (!count) {
+                            count = 1
+                        } else {
+                            count = count + 1
+                        }
+                        context["count"] = count
+                        console.info("test2执行" + context["count"])
+                        return count >= 5
+                    }, null, 5000)
+                    acquireEngine().submit("112", "test3", (context) => {
+                        console.info("test3执行")
+                        return true
+                    }, null, 1000)
                 } else {
-                    game.stop()
+                    //game.stop()
                     executionStatus = false
                 }
             },

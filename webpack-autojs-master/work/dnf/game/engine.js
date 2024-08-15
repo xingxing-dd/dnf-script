@@ -8,11 +8,10 @@ const ScriptExecutor = function(execute, depend, delay, sync) {
     this.next = Date.now(),
     this.run = function(context) {
         let current = Date.now()
-        console.info(current)
         if (this.next > current) {
             return
         }
-        let result = this.execute(this.after)
+        let result = this.execute(context)
         if (!result) {
             this.next = current + this.delay
         } else {
@@ -27,92 +26,62 @@ const ScriptExecutor = function(execute, depend, delay, sync) {
 const ScriptEngine = function(model) {
     this.status = "running",
     this.pipelines = {}
-    this.executors = {},
     this.runtime = runtime.instance(model),
     this.submit = function(flowId, name, execute, depend, delay, sync) {
         if (!this.pipelines[flowId]) {
             this.pipelines[flowId] = {
-                _context: {}
+                completed: false,
+                context: {},
+                executors: {}
             }
         }
-        if (this.pipelines[flowId][name]) {
+        if (this.pipelines[flowId]["executors"][name]) {
             return
         }
-        this.pipelines[flowId][name] = new ScriptExecutor(
+        this.pipelines[flowId]["executors"][name] = new ScriptExecutor(
             execute, 
-            delay, 
+            depend, 
             delay, 
             sync
         )
-        // this.executors[name] = {
-        //     flowId: flowId,
-        //     status: "pending",
-        //     execute: execute,
-        //     depend: depend,
-        //     delay: delay,
-        //     sync: sync == undefined ? true : sync,
-        //     next: Date.now(),
-        //     before: function() {
-        //         this.status = "processing"
-        //     },
-        //     after: function() {
-        //         this.status = "pending"
-        //     },
-        //     run: function() {
-        //         let current = Date.now()
-        //         console.info(current)
-        //         if (this.next > current) {
-        //             return
-        //         }
-        //         this.before()
-        //         let result = this.execute(this.after)
-        //         if (this.sync) {
-        //             this.after()
-        //         }
-        //         if (!result) {
-        //             this.next = current + this.delay
-        //         } else {
-        //             this.next = -1
-        //         }
-        //     },
-        //     completed: function() {
-        //         return !this || this.next == -1
-        //     }
-        // }
     },
     this.remove = function(flowId, name) {
-        if (!this.pipelines[flowId] || !this.pipelines[flowId][name]) {
+        if (!this.pipelines[flowId] || !this.pipelines[flowId]["executors"][name]) {
             return
         }
-        delete this.pipelines[flowId][name]
+        delete this.pipelines[flowId]["executors"][name]
     },
     this.boot = function() {
         if (this.status == "running") {
-            for (let flowId in this.pipelines) {
-                const pipeline = this.pipelines[flowId]
-                if (pipeline.completed()) {
-                    delete this.pipelines[flowId]
+            let flowIds = Object.keys(this.pipelines)
+            if (!flowIds || flowIds.length == 0) {
+                return
+            }
+            if (this.completed(flowIds[0])) {
+                console.info("执行完毕，结束执行:" + flowIds[0])
+                delete this.pipelines[flowIds[0]]
+                return
+            }
+            const executors = this.pipelines[flowIds[0]]["executors"]
+            const context = this.pipelines[flowIds[0]]["context"]
+            for(let name in executors) {
+                let executor = executors[name]
+                //如果当前执行完成，或者或依赖任务未完成，则不执行该任务
+                if (executor.completed() || (executor.depend && !executors[executor.depend]) || 
+                    (executor.depend && !executors[executor.depend].completed())) {
                     continue
                 }
-                const context = pipeline[_context]
-                for(let name in pipeline[flowId]) {
-                    const executor = pipeline[name]
-                    //当前未执行完毕，并且依赖任务不存在或者执行完成
-                    if (!executor.completed() && (!executor.depend || executor.depend.completed())) {
-                        //多线程执行任务
-                        threads.start(() => executor.run(context))
-                    }
-                }
+                threads.start(() => executor.run(context))
             }
         }  
     },
-    this.completed = function(flowId, name) {
-        if (!this.pipelines[flowId] || !this.pipelines[flowId][name] || this.pipelines[flowId][name].completed()) {
+    this.completed = function(flowId) {
+        if (!this.pipelines[flowId]) {
             return true
         }
-        for(let name in this.pipelines[flowId]) {
-            const task = this.pipelines[flowId][name]
-            if (!task.completed()) {
+        for(let name in this.pipelines[flowId]["executors"]) {
+            const task = this.pipelines[flowId]["executors"][name]
+            if (task && !task.completed()) {
                 return false
             }
         }
@@ -134,7 +103,6 @@ exports.initEngine = (model) => {
         console.info("初始化")
         scriptEngine = new ScriptEngine(model)
     }
-    console.info("获取：" + JSON.stringify(scriptEngine.tasks))
     return scriptEngine
 }
 
