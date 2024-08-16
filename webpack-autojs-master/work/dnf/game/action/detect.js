@@ -1,18 +1,15 @@
 const socket = require("../common/socket")
-const ScreenMatcher = function(target, callback) {
+const ScreenDetector = function(callback) {
     this.status = "pending",
     this.target = target,
     this.callback = callback,
-    this.match = function() {
+    this.detect = function() {
         if (this.status != 'pending') {
             return
         }
         this.status = 'processing'
         socket.send({
-            action: "screen-match",
-            data: {
-                target: this.target
-            }  
+            action: "screen-detect"  
         }, (data, status) => {
             if (status != "success") {
                 return
@@ -24,10 +21,9 @@ const ScreenMatcher = function(target, callback) {
         })
     }
 }
-exports.match = (target, callback) => {
-    const matcher = new ScreenMatcher(
-        target, 
+exports.detect = (callback) => {
+    const detector = new ScreenDetector(
         callback
     )
-    return matcher.match
+    return detector.detect
 }

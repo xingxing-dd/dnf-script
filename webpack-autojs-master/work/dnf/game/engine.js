@@ -24,7 +24,7 @@ const ScriptExecutor = function(execute, depend, delay, sync) {
 }
 
 const ScriptEngine = function(model) {
-    this.status = "running",
+    this.status = "init",
     this.pipelines = {}
     this.runtime = runtime.instance(model),
     this.submit = function(flowId, name, execute, depend, delay, sync) {
@@ -66,7 +66,6 @@ const ScriptEngine = function(model) {
             const context = this.pipelines[flowIds[0]]["context"]
             for(let name in executors) {
                 let executor = executors[name]
-                //如果当前执行完成，或者或依赖任务未完成，则不执行该任务
                 if (executor.completed() || (executor.depend && !executors[executor.depend]) || 
                     (executor.depend && !executors[executor.depend].completed())) {
                     continue
