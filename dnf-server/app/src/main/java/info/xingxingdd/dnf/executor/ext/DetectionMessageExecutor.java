@@ -39,7 +39,7 @@ public class DetectionMessageExecutor extends AbstractAsyncMessageExecutor {
                     YoloV5Ncnn.Obj[] targets = DetectionAssistant.yoloV5Ncnn.detect(screenshot, false);
                     Map<String, Object> data = new HashMap<>();
                     if (targets != null && targets.length > 0) {
-                        data.put("targets", Arrays.stream(targets).collect(Collectors.groupingBy(obj -> obj.label)));
+                        data.putAll(Arrays.stream(targets).collect(Collectors.groupingBy(obj -> obj.label)));
                     }
                     Output output = Output.success();
                     output.setRequestId(getRequestId());

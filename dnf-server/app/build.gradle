@@ -36,6 +36,7 @@ dependencies {
     implementation libs.material
     implementation libs.java.websocket
     implementation libs.gson
+    implementation 'com.google.mlkit:text-recognition-chinese:16.0.1'
 
     implementation(fileTree("libs"))
 }

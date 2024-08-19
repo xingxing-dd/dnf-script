@@ -1,33 +1,48 @@
-const socket = require("../common/socket")
-const ScreenMatcher = function(target, callback) {
-    this.status = "pending",
-    this.target = target,
-    this.callback = callback,
-    this.match = function() {
-        if (this.status != 'pending') {
+const socket = require("../../common/socket")
+const {debuger} = require("../../common/debug")
+const ScreenMatcher = function() {
+    this.matching = {},
+    this.process = function(data) {
+        if (!data || data.x == undefined || data.x < 0 || data.y < 0) {
             return
         }
-        this.status = 'processing'
-        socket.send({
-            action: "screen-match",
-            data: {
-                target: this.target
-            }  
-        }, (data, status) => {
-            if (status != "success") {
-                return
-            }
-            if (data && data.targets) {
-                this.callback(data.targets)
-            }
-            this.status = 'pending'
-        })
+        let randomX = data.x + 2 + Math.floor(random() * (data.w - 2))
+        let randomY = data.y + 2 + Math.floor(random() * (data.h - 2))
+        click(randomX, randomY)
+    },
+    this.match = function(context, target, callback) {
+        let matchPorcessResult = this.matching[target]
+        if (matchPorcessResult == "success") {
+            delete this.matching[target]
+            return true
+        }
+        if (matchPorcessResult == undefined) {
+            this.matching[target] = "processing"
+            socket.send({
+                action: "screen-match",
+                data: {
+                    target: target
+                }  
+            }, (data, status) => {
+                if (status != "success") {
+                    return
+                }
+                console.info("识别结果：" + JSON.stringify(data))
+                if (callback) {
+                    callback(context, data)
+                } else {
+                    this.process(data)
+                }
+                if (data && data.x != undefined) {
+                    debuger.add(data)
+                    this.matching[target] = "success"
+                } else {
+                    delete this.matching[target]
+                }
+            })
+        }
+        return false
     }
 }
-exports.match = (target, callback) => {
-    const matcher = new ScreenMatcher(
-        target, 
-        callback
-    )
-    return matcher.match
-}
+
+exports.matcher = new ScreenMatcher()

@@ -19,14 +19,14 @@ const ScriptExecutor = function(execute, depend, delay, sync) {
         }
     },
     this.completed = function() {
-        return !this || this.next == -1
+        return this && this.next == -1
     }
 }
 
-const ScriptEngine = function(model) {
+const ScriptEngine = function() {
     this.status = "init",
     this.pipelines = {}
-    this.runtime = runtime.instance(model),
+    this.runtime = runtime.instance(),
     this.submit = function(flowId, name, execute, depend, delay, sync) {
         if (!this.pipelines[flowId]) {
             this.pipelines[flowId] = {
@@ -62,12 +62,11 @@ const ScriptEngine = function(model) {
                 delete this.pipelines[flowIds[0]]
                 return
             }
-            const executors = this.pipelines[flowIds[0]]["executors"]
-            const context = this.pipelines[flowIds[0]]["context"]
+            let executors = this.pipelines[flowIds[0]]["executors"]
+            let context = this.pipelines[flowIds[0]]["context"]
             for(let name in executors) {
                 let executor = executors[name]
-                if (executor.completed() || (executor.depend && !executors[executor.depend]) || 
-                    (executor.depend && !executors[executor.depend].completed())) {
+                if (executor.completed() || (executor.depend && !executors[executor.depend].completed())) {
                     continue
                 }
                 threads.start(() => executor.run(context))
@@ -79,7 +78,7 @@ const ScriptEngine = function(model) {
             return true
         }
         for(let name in this.pipelines[flowId]["executors"]) {
-            const task = this.pipelines[flowId]["executors"][name]
+            let task = this.pipelines[flowId]["executors"][name]
             if (task && !task.completed()) {
                 return false
             }
@@ -94,17 +93,18 @@ const ScriptEngine = function(model) {
     }
 }
 
+exports.engine = new ScriptEngine()
 //全局唯一，脚本引擎对象
-var scriptEngine = undefined
+// var scriptEngine = new ScriptEngine()
   
-exports.initEngine = (model) => {
-    if (!scriptEngine) {
-        console.info("初始化")
-        scriptEngine = new ScriptEngine(model)
-    }
-    return scriptEngine
-}
+// exports.initEngine = (model) => {
+//     if (!scriptEngine) {
+//         console.info("初始化")
+//         scriptEngine = new ScriptEngine(model)
+//     }
+//     return scriptEngine
+// }
 
-exports.acquireEngine = () => {
-    return scriptEngine
-}
+// exports.acquireEngine = () => {
+//     return scriptEngine
+// }

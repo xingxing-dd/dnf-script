@@ -1,6 +1,5 @@
 var config = require("./config").config()
 exports.loadView = (view) => {
-    console.info("加载页面：" + view)
     const module = require("../view/" + view)
     ui.setContentView(module.view())
     if (!module.action) {
@@ -59,6 +58,11 @@ exports.async = (before, task, after, delay) => {
         ui.post(after)
     });
 }
-exports.addTask = () => {
-    
+exports.cache = (key, value) => {
+    var storage = storages.create("dnf-server");
+    if(value == undefined) {
+        storage.get(key)
+    } else {
+        storage.put(key, value)
+    }
 }

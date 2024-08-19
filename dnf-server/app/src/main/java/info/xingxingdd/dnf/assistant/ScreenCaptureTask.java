@@ -74,4 +74,11 @@ public abstract class ScreenCaptureTask implements Callable<Boolean> {
     public Map<String, Object> getData() {
         return this.data;
     }
+
+    public Object getData(String key) {
+        if (this.data == null) {
+            return null;
+        }
+        return this.data.get(key);
+    }
 }

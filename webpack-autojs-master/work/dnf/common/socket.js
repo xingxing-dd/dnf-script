@@ -86,10 +86,14 @@ exports.connect = () => {
 }
 
 exports.close = () => {
-    if (socket == null) {
-        return
+    try {
+        if (socket == null) {
+            return
+        }
+        socket.close(1000, "主动关闭")
+    } catch(e) {
+        console.info(e)
     }
-    socket.close()
 }
 
 exports.send = (message, func) => {

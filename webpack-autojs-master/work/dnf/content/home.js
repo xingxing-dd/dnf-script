@@ -1,50 +1,54 @@
 var utils = require("../common/utils")
-var { initEngine } = require("../game/engine")
 exports.display = () => {
-    var w = floaty.window(
-        <vertical layout_gravity="center" w="auto" h="auto" bg="#FFFFFF" padding="20">
-            <text text="DNF自动搬砖脚本V1.0" gravity="center" textColor="red"/>
-            <horizontal >
-                <text textSize="16sp"  layout_weight="1" gravity="center_vertical">角色职业</text>
-                <spinner id="sp1" entries="狂战士|鬼泣|漫游" layout_weight="3" gravity="left"/>
+    var w = floaty.rawWindow(
+        <vertical layout_gravity="center" w="{{Math.floor(device.width * 0.9)}}px" h="*" bg="#FFFFFF">
+            <text text="软蛋脚本V1.0" gravity="center" textColor="red"/>
+            <horizontal layout_gravity="center" w="*" textSize="14sp" padding="20px">
+                <text id="role_setting" layout_weight="1">角色列表</text>
+                <text id="game_setting" layout_weight="1" gravity="center">刷图设置</text>
+                <text id="system_setting" layout_weight="1" gravity="right">系统设置</text>
             </horizontal>
-            <horizontal>
-                <text textSize="16sp"  layout_weight="1" gravity="center_vertical">搬砖地图</text>
-                <spinner id="sp2" entries="布万家|山脊|绿都" layout_weight="3" gravity="left"/>
-            </horizontal>
-            <horizontal h="40sp">
-                <text textSize="16sp"  layout_weight="1" gravity="center_vertical">自动分解</text>
-                <checkbox id="cb1"  layout_weight="1" checked="true" text="白"/>
-                <checkbox id="cb2"  layout_weight="1" checked="true" text="蓝"/>
-                <checkbox id="cb2"  layout_weight="1" text="粉"/>
-            </horizontal>
-            <horizontal h="40sp">
-                <text textSize="16sp"  layout_weight="1" gravity="center_vertical">自动出售</text>
-                <checkbox id="cb1"  layout_weight="1" checked="true" text="白"/>
-                <checkbox id="cb2"  layout_weight="1" checked="true" text="蓝"/>
-                <checkbox id="cb2"  layout_weight="1" text="粉"/>
-            </horizontal>
-            <horizontal h="40sp">
-                <text textSize="16sp"  layout_weight="1" gravity="center_vertical">启动日志</text>
-                <checkbox id="cb1"  layout_weight="3" checked="true" text="是"/>
-            </horizontal>
-            <button id="launch" text="启动"/>
-            <button id="exit" text="退出"/>
+            
+            <relative id="content" gravity="center">
+                <list id="role_list" w="*" layout_alignParentTop="true" layout_centerHorizontal="true" layout_above="@+id/operation">
+                    <horizontal>
+                        <checkbox id="selected" text="{{roleName}}" checked="false"/>
+                        <horizontal w="auto" gravity="right">
+                            <text text="职业:{{roleType}}"/>
+                            <text text="删除"/>
+                            <text text="重新识别"/>
+                        </horizontal>
+                    </horizontal>
+                </list>
+                {/* <text textSize="10sp" padding="20px">{{text}}</text> */}
+                <horizontal id="operation" w="*" textSize="12sp" layout_alignParentBottom="true" layout_centerHorizontal="true">
+                    <button id="launch" layout_weight="1" text="保存"/>
+                    <button id="exit" layout_weight="1" text="重新识别"/>
+                </horizontal>
+            </relative>
         </vertical>
-    );
-    w.setSize(-1, -1);
-    w.launch.click(() => {
-        utils.async(
-            () => {
-                w.launch.setText("启动服务中...")
-                initEngine("debug")
-            },
-            () => utils.startServer(),
-            () => utils.loadContent("operator", w),
-            500
-        )
-    })
-    w.exit.click(() => {
+    )
+    w.setSize(-1, -1)
+    //w.setTouchable(false)
+    w.role_setting.setTextColor(colors.BLACK)
+    let text = "测试"
+    let list = [
+        {roleType:"狂战士",roleName:"测试1"},
+        {roleType:"鬼泣",roleName:"测试2"},
+        {roleType:"鬼泣",roleName:"测试3"},
+        {roleType:"鬼泣",roleName:"测试3"},
+        {roleType:"鬼泣",roleName:"测试3"},
+        {roleType:"鬼泣",roleName:"测试3"},
+        {roleType:"鬼泣",roleName:"测试3"},
+        {roleType:"鬼泣",roleName:"测试3"},
+        {roleType:"鬼泣",roleName:"测试3"},
+        {roleType:"鬼泣",roleName:"测试3"},
+        {roleType:"鬼泣",roleName:"测试3"},
+        {roleType:"鬼泣",roleName:"测试3"}
+    ]
+    w.role_list.setDataSource(list)
+    w.exit.click(()=> {
         w.close()
     })
+    ui.run(()=>{ w.requestFocus(); })
 }

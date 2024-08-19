@@ -24,6 +24,7 @@ import java.util.Objects;
 import info.xingxingdd.dnf.assistant.DetectionAssistant;
 import info.xingxingdd.dnf.assistant.ScreenCapture;
 import info.xingxingdd.dnf.assistant.ScreenCaptureTask;
+import info.xingxingdd.dnf.assistant.TemplateConfig;
 import info.xingxingdd.dnf.executor.AbstractAsyncMessageExecutor;
 import info.xingxingdd.dnf.server.message.Input;
 import info.xingxingdd.dnf.server.message.Output;
@@ -50,27 +51,33 @@ public class OperationMessageExecutor extends AbstractAsyncMessageExecutor {
     @Override
     protected void doAsyncProcess(Input input) {
         Log.i("dnf-server", "开出处理:" + new Gson().toJson(input));
-
         ScreenCaptureTask screenCaptureTask = new ScreenCaptureTask(input.getRequestId(), input.getData()) {
 
             @Override
             protected boolean process(Bitmap screenshot) {
                 try {
-                    MatchTemplate target = new MatchTemplate(Objects.requireNonNull(DetectionAssistant.readBitmap((String) getData().get("operation") + ".png")));
+                    Bitmap targetImg = DetectionAssistant.readBitmap("template/" + getData().get("target") + ".jpg");
+                    assert targetImg != null;
+                    MatchTemplate target = new MatchTemplate(targetImg);
                     MatchTemplate source = new MatchTemplate(screenshot);
-                    int index = Integer.valueOf((String) getData().get("operation"));
-                    List<Float> f = positions.get(index - 1);
-                    source.setLeft((int) (screenshot.getWidth() * f.get(0)));
-                    source.setRight((int) (screenshot.getWidth() * f.get(1)));
-                    source.setTop((int) (screenshot.getHeight() * f.get(2)));
-                    source.setBottom((int) (screenshot.getHeight() * f.get(3)));
+                    TemplateConfig.Config config = TemplateConfig.getConfig((String) getData().get("target"));
+                    source.setLeft((int) (screenshot.getWidth() * config.left));
+                    source.setRight((int) (screenshot.getWidth() * config.right));
+                    source.setTop((int) (screenshot.getHeight() * config.top));
+                    source.setBottom((int) (screenshot.getHeight() * config.bottom));
                     MatchResult matchResult = TemplateMatcher.match(target, source, 0.6f);
                     Log.i("dnf-server", "识别到目标:" + new Gson().toJson(matchResult));
                     //saveResult(screenshot, matchResult);
                     Output output = Output.success();
                     output.setRequestId(getRequestId());
                     Map<String, Object> data = new HashMap<>();
-                    data.put("result", matchResult);
+                    if (matchResult != null) {
+                        data.put("x", matchResult.getX());
+                        data.put("y", matchResult.getY());
+                        data.put("w", matchResult.getW());
+                        data.put("h", matchResult.getH());
+                        data.put("label", config.desc);
+                    }
                     output.setData(data);
                     connectionManager.send(output);
                 } catch (Exception e) {

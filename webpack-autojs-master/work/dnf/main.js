@@ -1,15 +1,10 @@
 var utils = require("./common/utils")
-var { acquireEngine }   = require("./game/engine")
+var { engine }   = require("./game/engine")
+"ui";
 auto();
-utils.loadContent("home")
+utils.loadContent("boot")
 //主循环，保持进程不会关闭
-setInterval(() => {
-    const engine = acquireEngine()
-    if (!engine) {
-        return
-    }
-    engine.boot()
-}, 100)
+setInterval(() => engine.boot(), 100)
 
 events.on('exit', () => {
     //java.lang.System.exit(0);

@@ -1,9 +1,9 @@
-let img = images.read("./binary_image.png")
+let img = images.read("./2.png")
 //importClass(com.googlecode.tesseract.android.TessBaseAPI)
 //新建OCR实例
 //var tessocr = new TessBaseAPI()
 // 新增：自定义模型路径(必须是绝对路径), files.path() 将相对路径转为绝对路径
-let myModelPath = files.path("./models");
+//let myModelPath = files.path("./models");
 let start = new Date()
 // 识别图片中的文字，返回完整识别信息（兼容百度OCR格式）。
 let result = gmlkit.ocr(img, "zh")
