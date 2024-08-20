@@ -1,7 +1,8 @@
 const socket = require("../../common/socket")
+const {debuger} = require("../../common/debug")
 const Ocr = function() {
     this.matching = {},
-    this.detect = function(context, id, rect, callback) {
+    this.detect = function(context, id, label, callback) {
         let matchPorcessResult = this.matching[id]
         if (matchPorcessResult == "success") {
             delete this.matching[id]
@@ -10,8 +11,8 @@ const Ocr = function() {
         if (matchPorcessResult == undefined) {
             this.matching[id] = "processing"
             socket.send({
-                action: "screen-text",
-                data: rect
+                action: "gen-text-match",
+                data: {label: label}
             }, (data, status) => {
                 if (status != "success") {
                     return
@@ -22,6 +23,7 @@ const Ocr = function() {
                 } else {
                     this.process(data)
                 }
+                debuger.add(data)
                 this.matching[id] = "success"
             })
         }

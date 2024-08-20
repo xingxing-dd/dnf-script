@@ -93,17 +93,19 @@ exports.display = () => {
                     // engine.submit("111", "match15", (context) => matcher.match(context, "15", (data) => cache("skill_15", data)), "match14", 1000)
                     // engine.submit("111", "match16", (context) => matcher.match(context, "16", (data) => cache("skill_16", data)), "match15", 1000)
                     // engine.submit("111", "match17", (context) => matcher.match(context, "17", (data) => cache("skill_17", data)), "match15", 1000)
-                    engine.submit("111", "match19", (context) => matcher.match(context, "19", (context, data) => {
-                        context["rect"] = {
-                            x: data.x + data.w,
-                            y: data.y,
-                            w: data.w * 3,
-                            h: data.h
-                        }
-                    }), null, 1000)
-                    engine.submit("111", "match17", (context) => ocr.detect(context, "111", context["rect"], (context, data) => {
-                        console.info(JSON.stringify(data))
-                    }), "match19", 1000)
+                    // engine.submit("111", "match19", (context) => matcher.match(context, "19", (context, data) => {
+                    //     context["rect"] = {
+                    //         x: data.x + data.w,
+                    //         y: data.y,
+                    //         w: data.w * 3,
+                    //         h: data.h
+                    //     }
+                    // }), null, 1000)
+                    engine.submit("111", "match17", (context) => ocr.detect(context, "111", "2009年的秋天", (context, data) => { }), null, 1000)
+                    engine.submit("111", "match18", (context) => ocr.detect(context, "111", "2009年玩红眼", (context, data) => { }), "match17", 1000)
+                    engine.submit("111", "match19", (context) => ocr.detect(context, "111", "鸡哔伱呦", (context, data) => { }), "match18", 1000)
+                    engine.submit("111", "match20", (context) => ocr.detect(context, "111", "且吃我一脚", (context, data) => { }), "match19", 1000)
+                    engine.submit("111", "match21", (context) => ocr.detect(context, "111", "星仔的修罗", (context, data) => { }), "match20", 1000)
                     engine.start()
                 } else {
                     //game.stop()

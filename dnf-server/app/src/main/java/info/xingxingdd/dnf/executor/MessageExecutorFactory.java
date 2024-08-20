@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import info.xingxingdd.dnf.executor.ext.DetectionMessageExecutor;
+import info.xingxingdd.dnf.executor.ext.GenTextMatchMessageExecutor;
 import info.xingxingdd.dnf.executor.ext.OperationMessageExecutor;
 import info.xingxingdd.dnf.executor.ext.ScreenshotMessageExecutor;
 import info.xingxingdd.dnf.executor.ext.TextDetectMessageExecutor;
@@ -17,6 +18,7 @@ public class MessageExecutorFactory {
         executors.put("screenshot", new ScreenshotMessageExecutor());
         executors.put("screen-detect", new DetectionMessageExecutor());
         executors.put("screen-text", new TextDetectMessageExecutor());
+        executors.put("gen-text-match", new GenTextMatchMessageExecutor());
     }
 
     public static MessageExecutor acquire(String action) {

@@ -52,6 +52,9 @@ const Debugger = function() {
         if (!this.window) {
             this.init()
         }
+        if (!box) {
+            return
+        }
         this.boxs.push(box)
     },
     this.close = function() {
