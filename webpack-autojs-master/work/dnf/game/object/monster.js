@@ -6,8 +6,8 @@ exports.instance = (properties) => {
                 return null
             }
             return {
-                x: this.bounds.x + this.bounds.width / 2,
-                y: this.bounds.y + this.bounds.height,
+                x: this.bounds.x + this.bounds.w / 2,
+                y: this.bounds.y + this.bounds.h,
             }
         }
     })

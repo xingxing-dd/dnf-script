@@ -30,6 +30,7 @@ const GameAgent = function(config) {
         console.info("攻击指令")
         this.moveJudgment(rocker, monster)
     },
+    this.pickupJudgment = function(rocker, reward) {
         console.info("拾取指令")
         this.moveJudgment(rocker, reward)
     },
