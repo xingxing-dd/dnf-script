@@ -1,6 +1,6 @@
 const runtime = require("./runtime")
 
-const ScriptExecutor = function(execute, depend, delay, sync) {
+const ScriptExecutor = function(execute, delay, depend, sync) {
     this.execute = execute,
     this.depend = depend,
     this.delay = delay,
@@ -25,26 +25,35 @@ const ScriptExecutor = function(execute, depend, delay, sync) {
 
 const ScriptEngine = function() {
     this.status = "init",
+    this.callback = {},
     this.pipelines = {}
     this.runtime = runtime.instance(),
-    this.load = function(pipeline) {
-        let id = Date.now()
-        for(let name in pipeline) {
-            if (pipeline[name][action] == "detect") {
-
-            } else if (pipeline[name][action] == "match") {
-                this.submit(id, name, (context) => matcher.match(context, pipeline[name].ext, pipeline[name].callback), null, 500)
-            } 
-        }
-    },
-    this.submit = function(flowId, name, execute, depend, delay, sync) {
+    this.comfirm = function(flowId, before, after) {
         if (!this.pipelines[flowId]) {
-            this.pipelines[flowId] = {completed: false,context: {},executors: {}}
+            return
+        }
+        this.pipelines[flowId]["before"] = before
+        this.pipelines[flowId]["after"] = after
+        this.pipelines[flowId]["status"] = "pending"
+    },
+    this.submit = function(flowId, name, execute, delay, depend, sync) {
+        if (!this.pipelines[flowId]) {
+            this.pipelines[flowId] = {
+                status: "init",
+                context: {},
+                executors: {},
+                before: () => console.log("任务开始:" + flowId),
+                after: () => console.log("任务结束:" + flowId)
+            }
         }
         if (this.pipelines[flowId]["executors"][name]) {
             return
         }
-        this.pipelines[flowId]["executors"][name] = new ScriptExecutor(execute, depend, delay, sync)
+        if (depend == undefined) {
+            let executorKeys = Object.keys(this.pipelines[flowId]["executors"])
+            depend= !executorKeys || executorKeys.length == 0 ? undefined : executorKeys[executorKeys.length - 1]
+        }
+        this.pipelines[flowId]["executors"][name] = new ScriptExecutor(execute, delay, depend, sync)
     },
     this.remove = function(flowId, name) {
         if (!this.pipelines[flowId] || !this.pipelines[flowId]["executors"][name]) {
@@ -58,10 +67,18 @@ const ScriptEngine = function() {
             if (!flowIds || flowIds.length == 0) {
                 return
             }
+            let status = this.pipelines[flowIds[0]]["status"]
+            if (status == "init") {
+                return
+            }
             if (this.completed(flowIds[0])) {
-                console.info("执行完毕，结束执行:" + flowIds[0])
+                this.pipelines[flowIds[0]]["after"]()
                 delete this.pipelines[flowIds[0]]
                 return
+            }
+            if (status == 'pending') {
+                this.pipelines[flowIds[0]]["status"] = "processing"
+                this.pipelines[flowIds[0]]["before"]()
             }
             let executors = this.pipelines[flowIds[0]]["executors"]
             let context = this.pipelines[flowIds[0]]["context"]

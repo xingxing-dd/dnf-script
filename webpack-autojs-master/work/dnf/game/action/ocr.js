@@ -23,8 +23,12 @@ const Ocr = function() {
                 } else {
                     this.process(data)
                 }
-                debuger.add(data)
-                this.matching[id] = "success"
+                if (data && data.x != undefined) {
+                    debuger.add(data)
+                    this.matching[id] = "success"
+                } else {
+                    delete this.matching[id]
+                }
             })
         }
         return false

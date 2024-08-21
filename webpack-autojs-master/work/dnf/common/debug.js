@@ -1,4 +1,4 @@
-const Debugger = function() {
+const Debuger = function() {
     this.window = undefined,
     this.boxs = [],
     this.boxFont = undefined,
@@ -24,7 +24,10 @@ const Debugger = function() {
             return
         }
         this.window = floaty.rawWindow(
-            <canvas id="borad" w="*" h="*"></canvas>
+            <relative w="*" h="*">
+                <text id="title" textColor="red" textSize="16sp"w="*" gravity="center_horizontal"/>
+                <canvas id="borad" w="*" h="*"></canvas>
+            </relative>
         )
         this.window.setSize(-1, -1)
         this.window.setTouchable(false)
@@ -48,11 +51,17 @@ const Debugger = function() {
         }
         this.boxs = boxs == undefined ? [] : boxs
     },
+    this.title = function(title) {
+        if (!this.window) {
+            this.init()
+        }
+        this.window.title.setText(title)
+    }
     this.add = function(box) {
         if (!this.window) {
             this.init()
         }
-        if (!box) {
+        if (!box || box.x == undefined) {
             return
         }
         this.boxs.push(box)
@@ -62,6 +71,7 @@ const Debugger = function() {
             return
         }
         this.window.close()
+        this.window = undefined
     }
 }
-exports.debuger = new Debugger()
+exports.debuger = new Debuger()

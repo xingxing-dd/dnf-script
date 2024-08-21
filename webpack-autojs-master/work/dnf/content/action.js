@@ -8,6 +8,7 @@ exports.display = () => {
     var { ocr } = require("../game/action/ocr")
     var { engine }   = require("../game/engine")
     var { cache } = require("../common/utils")
+    const keyboard = require("../game/pipeline/keyboard")
     var autoCloseTimer = null
     var executionStatus = false
     var w = floaty.rawWindow(
@@ -101,12 +102,13 @@ exports.display = () => {
                     //         h: data.h
                     //     }
                     // }), null, 1000)
-                    engine.submit("111", "match17", (context) => ocr.detect(context, "111", "2009年的秋天", (context, data) => { }), null, 1000)
-                    engine.submit("111", "match18", (context) => ocr.detect(context, "111", "2009年玩红眼", (context, data) => { }), "match17", 1000)
-                    engine.submit("111", "match19", (context) => ocr.detect(context, "111", "鸡哔伱呦", (context, data) => { }), "match18", 1000)
-                    engine.submit("111", "match20", (context) => ocr.detect(context, "111", "且吃我一脚", (context, data) => { }), "match19", 1000)
-                    engine.submit("111", "match21", (context) => ocr.detect(context, "111", "星仔的修罗", (context, data) => { }), "match20", 1000)
-                    engine.start()
+                    // engine.submit("111", "match17", (context) => ocr.detect(context, "111", "2009年的秋天", (context, data) => { }), null, 1000)
+                    // engine.submit("111", "match18", (context) => ocr.detect(context, "111", "2009年玩红眼", (context, data) => { }), "match17", 1000)
+                    // engine.submit("111", "match19", (context) => ocr.detect(context, "111", "鸡哔伱呦", (context, data) => { }), "match18", 1000)
+                    // engine.submit("111", "match20", (context) => ocr.detect(context, "111", "且吃我一脚", (context, data) => { }), "match19", 1000)
+                    // engine.submit("111", "match21", (context) => ocr.detect(context, "111", "星仔的修罗", (context, data) => { }), "match20", 1000)
+                    // engine.start()
+                    keyboard.init()
                 } else {
                     //game.stop()
                     engine.pause()

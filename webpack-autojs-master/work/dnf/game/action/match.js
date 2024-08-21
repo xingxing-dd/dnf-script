@@ -1,5 +1,7 @@
 const socket = require("../../common/socket")
-const {debuger} = require("../../common/debug")
+const { debuger } = require("../../common/debug")
+const { template } = require("../config/template")
+
 const ScreenMatcher = function() {
     this.matching = {},
     this.process = function(data) {
@@ -16,12 +18,19 @@ const ScreenMatcher = function() {
             delete this.matching[target]
             return true
         }
+        let templateConfig = template[target]
+        if (templateConfig == undefined) {
+            delete this.matching[target]
+            return true
+        }
         if (matchPorcessResult == undefined) {
             this.matching[target] = "processing"
             socket.send({
                 action: "screen-match",
                 data: {
-                    target: target
+                    template: target,
+                    bounds: templateConfig["bounds"],
+                    label: templateConfig["label"]
                 }  
             }, (data, status) => {
                 if (status != "success") {

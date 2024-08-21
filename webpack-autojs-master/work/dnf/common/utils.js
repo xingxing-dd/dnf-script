@@ -58,11 +58,21 @@ exports.async = (before, task, after, delay) => {
         ui.post(after)
     });
 }
-exports.cache = (key, value) => {
-    var storage = storages.create("dnf-server");
-    if(value == undefined) {
-        storage.get(key)
-    } else {
-        storage.put(key, value)
+exports.cache = (key, value, noSerialization) => {
+    let storage = storages.create("dnf-server");
+    if (!noSerialization) {
+        value = JSON.stringify(value)
     }
+    storage.put(key, value)
+}
+exports.acquire = (key, noSerialization) => {
+    let storage = storages.create("dnf-server");
+    let value = storage.get(key)
+    if (value && !noSerialization) {
+        value = JSON.parse(value)
+    }
+    return value
+}
+exports.remove = () => {
+    storages.remove("dnf-server")
 }

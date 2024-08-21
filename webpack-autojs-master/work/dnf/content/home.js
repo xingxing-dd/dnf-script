@@ -58,26 +58,24 @@ exports.display = () => {
                 <frame>
                     <text text="有问题请联系开发者进行处理!" textColor="red" textSize="16sp"/>
                 </frame>
+                <frame>
+                    <text text="有问题请联系开发者进行处理!" textColor="red" textSize="16sp"/>
+                </frame>
             </viewpager>
         </vertical>
     )
     w.setSize(-1, -1)
 
     //设置滑动页面的标题
-    w.viewpager.setTitles(["搬砖仔列表", "系统设置", "系统公告"]);
+    w.viewpager.setTitles(["搬砖仔列表", "搬砖设置", "系统设置", "系统公告"]);
     //让滑动页面和标签栏联动
     w.tabs.setupWithViewPager(w.viewpager);
     //w.setTouchable(false)
     // w.role_setting.setTextColor(colors.BLACK)
-    let list = [
-        {roleType:"大魔导师|暗狱战狂|狂暴者|大暗黑天",roleName:"2009年的秋天"},
-        {roleType:"暗狱战狂|大魔导师|狂暴者|大暗黑天",roleName:"2009年玩红眼"},
-        {roleType:"狂暴者|暗狱战狂|大魔导师|大暗黑天",roleName:"鸡哔伱呦"},
-        {roleType:"大暗黑天|狂暴者|暗狱战狂|大魔导师",roleName:"星仔的修罗"}
-    ]
+    let list = []
     w.role_list.setDataSource(list)
     w.add.click(() => {
-        list = list.concat({roleType:"暗狱战狂|大魔导师|狂暴者|大暗黑天",roleName:"xxx"})
+        list = list.concat({roleType:"暗狱战狂|大暗黑天",roleName:""})
         w.role_list.setDataSource(list)
         w.role_list.getAdapter().notifyItemChanged(list.length - 1)
         w.role_list.smoothScrollToPosition(list.length - 1)
