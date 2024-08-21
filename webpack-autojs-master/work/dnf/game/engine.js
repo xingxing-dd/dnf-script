@@ -27,23 +27,24 @@ const ScriptEngine = function() {
     this.status = "init",
     this.pipelines = {}
     this.runtime = runtime.instance(),
+    this.load = function(pipeline) {
+        let id = Date.now()
+        for(let name in pipeline) {
+            if (pipeline[name][action] == "detect") {
+
+            } else if (pipeline[name][action] == "match") {
+                this.submit(id, name, (context) => matcher.match(context, pipeline[name].ext, pipeline[name].callback), null, 500)
+            } 
+        }
+    },
     this.submit = function(flowId, name, execute, depend, delay, sync) {
         if (!this.pipelines[flowId]) {
-            this.pipelines[flowId] = {
-                completed: false,
-                context: {},
-                executors: {}
-            }
+            this.pipelines[flowId] = {completed: false,context: {},executors: {}}
         }
         if (this.pipelines[flowId]["executors"][name]) {
             return
         }
-        this.pipelines[flowId]["executors"][name] = new ScriptExecutor(
-            execute, 
-            depend, 
-            delay, 
-            sync
-        )
+        this.pipelines[flowId]["executors"][name] = new ScriptExecutor(execute, depend, delay, sync)
     },
     this.remove = function(flowId, name) {
         if (!this.pipelines[flowId] || !this.pipelines[flowId]["executors"][name]) {
