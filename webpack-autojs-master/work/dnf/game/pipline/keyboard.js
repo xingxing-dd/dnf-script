@@ -1,21 +1,9 @@
-var { engine }   = require("../engine")
-
-{
-    "1"= {
-        template:"ayzk/1",
-        action: "match",
-        ext:{},
-        desc:"操作杆",
-        callback: ()=>{}
+exports.pipeline = function() {
+    return {
+        "1":{
+            label: "操作杆",
+            scope: [],
+            template: "ayzk/1"
+        }
     }
-}
-
-const KeyboardInit = function() {
-    this.exec = function() {
-       engine.submit 
-    }
-}
-
-exports.init = function() {
-    return new KeyboardInit()
 }

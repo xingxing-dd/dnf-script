@@ -56,14 +56,17 @@ public class OperationMessageExecutor extends AbstractAsyncMessageExecutor {
             @Override
             protected boolean process(Bitmap screenshot) {
                 try {
-                    Bitmap targetImg = DetectionAssistant.readBitmap("template/" + getData().get("target") + ".jpg");
+                    Map<String, Object> data = getData();
+                    Bitmap targetImg = DetectionAssistant.readBitmap("template/" + data.get("template") + ".jpg");
                     assert targetImg != null;
                     MatchTemplate target = new MatchTemplate(targetImg);
                     MatchTemplate source = new MatchTemplate(screenshot);
                     TemplateConfig.Config config = TemplateConfig.getConfig((String) getData().get("target"));
-                    source.setLeft((int) (screenshot.getWidth() * config.left));
-                    source.setRight((int) (screenshot.getWidth() * config.right));
-                    source.setTop((int) (screenshot.getHeight() * config.top));
+                    List<Float> scope = (List<Float>) data.get("scope");
+                    assert scope != null;
+                    source.setLeft((int) (screenshot.getWidth() * scope.get(0)));
+                    source.setRight((int) (screenshot.getWidth() * scope.get(1)));
+                    source.setTop((int) (screenshot.getHeight() * scope.get(2)));
                     source.setBottom((int) (screenshot.getHeight() * config.bottom));
                     MatchResult matchResult = TemplateMatcher.match(target, source, 0.6f);
                     Log.i("dnf-server", "识别到目标:" + new Gson().toJson(matchResult));
