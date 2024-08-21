@@ -14,8 +14,19 @@ const ScreenDetector = function() {
         const degAngle = radAngle * (180 / Math.PI)
         return ((degAngle + 360) % 360) 
     },
-    this.distanceCalcul = function(source, target) {
-        return Math.sqrt(Math.pow(target.x - source.x, 2) + Math.pow(target.y - source.y, 2))  
+    this.distanceCalcul = function(source, targets) {
+        let distances = []
+        let sourceCenter = this.bottomCenter(source)
+        for (let target of targets) {
+            let targetCenter = this.bottomCenter(target)
+            distances.push({
+                target: target,
+                sourceCenter: sourceCenter,
+                targetCenter: targetCenter,
+                distance: Math.sqrt(Math.pow(targetCenter.x - sourceCenter.x, 2) + Math.pow(targetCenter.y - sourceCenter.y, 2))
+            })
+        }
+        return distances 
     },
     this.suitableTarget = function(targets) {
         if (!targets || targets.length == 0) {
@@ -37,48 +48,37 @@ const ScreenDetector = function() {
         if (!source || !targets) {
             return
         }
-        const sourceCenter = bottomCenter(source);  
-        let minDistance = 999999;  
-        let closestTarget = null;  
-        let closestAngle = null;  
-        for (let target of targets) {  
-            const targetCenter = bottomCenter(target);  
-            const distance = distance(sourceCenter, targetCenter);  
-
-            if (distance < minDistance) {  
-                minDistance = distance;  
-                closestTarget = target;  
-                closestAngle = angleCalcul(sourceCenter, targetCenter);  
-            }   
-        }  
-        return {  
-            target: closestTarget,  
-            distance: minDistance,  
-            angle: closestAngle  
-        }; 
+        let closestResult = {distance: 999999}
+        let distances = this.distanceCalcul(source, targets)
+        for (let d of distances) {
+            if (closestResult["distance"] < d.distance) {
+                continue
+            }
+            closestResult["distance"] = d.distance
+            closestResult["angle"] = this.angleCalcul(d.sourceCenter, d.targetCenter); 
+            closestResult["target"] = d.target
+            closestResult["p1"] = d.sourceCenter
+            closestResult["p2"] = d.targetCenter
+        }
+        return closestResult
     },
     this.findFarthest = function(source, targets) {
         if (!source || !targets) {
             return
         }
-        const sourceCenter = bottomCenter(source);  
-        let maxDistance = 0;  
-        let farthestTarget = null;  
-        let farthestAngle = null;  
-        for (let target of targets) {  
-            const targetCenter = bottomCenter(target);  
-            const distance = distance(sourceCenter, targetCenter);  
-            if (distance < minDistance) {  
-                maxDistance = distance;  
-                farthestTarget = target;  
-                farthestAngle = angleCalcul(sourceCenter, targetCenter);  
-            }   
-        }  
-        return {  
-            target: farthestTarget,  
-            distance: maxDistance,  
-            angle: farthestAngle  
-        }; 
+        let farthestResult = {distance: 0}
+        let distances = this.distanceCalcul(source, targets)
+        for (let d of distances) {
+            if (farthestResult["distance"] > d.distance) {
+                continue
+            }
+            farthestResult["distance"] = d.distance
+            farthestResult["angle"] = this.angleCalcul(d.sourceCenter, d.targetCenter); 
+            farthestResult["target"] = d.target
+            farthestResult["p1"] = d.sourceCenter
+            farthestResult["p2"] = d.targetCenter
+        }
+        return farthestResult
     },
     this.suitableDoor = function(coward, guidance, doors) {
         if (!coward || !guidance) {
