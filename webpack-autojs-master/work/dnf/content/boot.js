@@ -36,7 +36,7 @@ exports.display = () => {
     w.launch.click(() => {
         utils.async(
             () => w.launch.setText("启动服务中..."),
-            () => utils.startServer(),
+            () => {},//utils.startServer(),
             () => utils.loadContent("action", w),
             500
         )

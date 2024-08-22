@@ -108,6 +108,7 @@ exports.display = () => {
                     // engine.submit("111", "match20", (context) => ocr.detect(context, "111", "且吃我一脚", (context, data) => { }), "match19", 1000)
                     // engine.submit("111", "match21", (context) => ocr.detect(context, "111", "星仔的修罗", (context, data) => { }), "match20", 1000)
                     // engine.start()
+                    requestScreenCapture(true)
                     keyboard.init()
                 } else {
                     //game.stop()

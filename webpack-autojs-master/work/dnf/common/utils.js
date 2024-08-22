@@ -76,3 +76,5 @@ exports.acquire = (key, noSerialization) => {
 exports.remove = () => {
     storages.remove("dnf-server")
 }
+
+exports.plugin = plugins.load("info.xingxingdd.dnf.script.plugin");

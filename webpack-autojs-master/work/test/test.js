@@ -116,15 +116,25 @@
 //     x = x + 100
 //     y = y + 100
 // }
-var Obj = function(age) {
-    return {
-        age: age,
-        setAge: function(t){
-            this.age = t
-        }
-    }
-}
-var obj = new Obj(2)
-console.info(obj.age)
-obj.setAge(10)
-console.info(obj.age)
+// var Obj = function(age) {
+//     return {
+//         age: age,
+//         setAge: function(t){
+//             this.age = t
+//         }
+//     }
+// }
+// var obj = new Obj(2)
+// console.info(obj.age)
+// obj.setAge(10)
+// console.info(obj.age)
+requestScreenCapture();
+let dnfScriptPlugin = plugins.load("info.xingxingdd.dnf.script.plugin");
+let capture = captureScreen();
+let bitmap = capture.getBitmap()
+let start = new Date()
+let dresult = dnfScriptPlugin.detect(bitmap)
+console.log(JSON.stringify(dresult));
+log('检测耗时：' + (new Date() - start) + 'ms')
+// let result = dnfScriptPlugin.match(bitmap, "template/berserker/1", [0.7, 0.95, 0.85, 0.9])
+// console.log(JSON.stringify(result));

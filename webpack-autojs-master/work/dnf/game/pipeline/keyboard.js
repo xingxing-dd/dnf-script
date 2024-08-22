@@ -16,7 +16,7 @@ const match = (context, base, template) => {
 }
 
 const submit = () => {
-    engine.submit("111", "match17", (context) => ocr.detect(context, "111", "2009年玩红眼", (context, data) => { }), 1000)
+    //engine.submit("111", "match17", (context) => ocr.detect(context, "111", "2009年玩红眼", (context, data) => { }), 1000)
     engine.submit("111", "match/berserker/rocker", (context) => match(context, "common", "rocker"), 500)
     engine.submit("111", "match/berserker/1", (context) => match(context, "role/berserker", "1"), 500)
     engine.submit("111", "match/berserker/2", (context) => match(context, "role/berserker", "2"), 500)
