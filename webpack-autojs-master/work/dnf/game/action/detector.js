@@ -1,4 +1,4 @@
-const socket = require("../../common/socket")
+const { plugin } = require("../../common/utils")
 const ScreenDetector = function() {
     this.status = "pending",
     this.bottomCenter = function(box) {
@@ -93,14 +93,14 @@ const ScreenDetector = function() {
     this.process = function(context, result) {
         context["objects"] = {}
         let coward = this.suitableTarget(result["coward"])
-        let rocker = {}
         let monster = this.findClosest(coward, result["monster"])
         let reward = this.findClosest(coward, result["reward"])
         let guidance = this.findFarthest(coward, result["guidance"])
         let door = this.suitableDoor(coward, guidance, result["door"])
         context["objects"] = {
             coward: coward,
-            rocker: rocker,
+            rocker: {},
+            skills: {},
             monster: monster,
             reward: reward,
             door: door,
@@ -108,8 +108,7 @@ const ScreenDetector = function() {
         }
     },
     this.detect = function(context, callback) {
-        if (this.status == 'pending') {
-            this.status = 'processing'
+        if (this.status != 'pending') {
             socket.send({
                 action: "screen-detect"  
             }, (data, status) => {
@@ -121,9 +120,14 @@ const ScreenDetector = function() {
                 if (callback) {
                     callback(context, data)
                 }
-                this.status = 'pending'
             })
         }
+        this.status = "processing"
+        let capture = captureScreen()
+        let bitmap = capture.getBitmap()
+        let result = plugin.detect(bitmap)
+        this.process(context, result)
+        this.status = "pending"
     }
 }
 exports.detector = new ScreenDetector()

@@ -111,18 +111,5 @@ const ScriptEngine = function() {
     }
 }
 
-exports.engine = new ScriptEngine()
 //全局唯一，脚本引擎对象
-// var scriptEngine = new ScriptEngine()
-  
-// exports.initEngine = (model) => {
-//     if (!scriptEngine) {
-//         console.info("初始化")
-//         scriptEngine = new ScriptEngine(model)
-//     }
-//     return scriptEngine
-// }
-
-// exports.acquireEngine = () => {
-//     return scriptEngine
-// }
+exports.engine = new ScriptEngine()

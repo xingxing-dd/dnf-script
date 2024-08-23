@@ -1,8 +1,8 @@
 const { remove, acquire, cache } = require("../../common/utils")
 const { engine }   = require("../engine")
-const { matcher } = require("../action/match")
+const { matcher } = require("../action/matcher")
 var { ocr } = require("../action/ocr")
-const { debuger } = require("../../common/debug")
+const { debuger } = require("../../common/debuger")
 
 const match = (context, base, template) => {
     return matcher.match(context, base + "/" + template, (context, data) => {

@@ -1,5 +1,5 @@
 const socket = require("../../common/socket")
-const {debuger} = require("../../common/debug")
+const {debuger} = require("../../common/debuger")
 const Ocr = function() {
     this.matching = {},
     this.detect = function(context, id, label, callback) {
