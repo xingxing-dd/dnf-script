@@ -91,43 +91,32 @@ const ScreenDetector = function() {
         return this.findClosest(coward, [result.target])
     },
     this.process = function(context, result) {
-        context["objects"] = {}
-        let coward = this.suitableTarget(result["coward"])
-        let monster = this.findClosest(coward, result["monster"])
-        let reward = this.findClosest(coward, result["reward"])
-        let guidance = this.findFarthest(coward, result["guidance"])
-        let door = this.suitableDoor(coward, guidance, result["door"])
-        context["objects"] = {
-            coward: coward,
-            rocker: {},
-            skills: {},
-            monster: monster,
-            reward: reward,
-            door: door,
-            guidance: guidance
-        }
+        context["objects"] = result
+        // let coward = this.suitableTarget(result["coward"])
+        // let monster = this.findClosest(coward, result["monster"])
+        // let reward = this.findClosest(coward, result["reward"])
+        // let guidance = this.findFarthest(coward, result["guidance"])
+        // let door = this.suitableDoor(coward, guidance, result["door"])
+        // context["objects"] = {
+        //     coward: coward,
+        //     rocker: {},
+        //     skills: {},
+        //     monster: monster,
+        //     reward: reward,
+        //     door: door,
+        //     guidance: guidance
+        // }
     },
     this.detect = function(context, callback) {
-        if (this.status != 'pending') {
-            socket.send({
-                action: "screen-detect"  
-            }, (data, status) => {
-                if (status != "success") {
-                    return
-                }
-                console.info("识别结果：" + JSON.stringify(data))
-                this.process(context, data)
-                if (callback) {
-                    callback(context, data)
-                }
-            })
+        if (this.status = 'pending') {
+            this.status = "processing"
+            let capture = captureScreen()
+            let bitmap = capture.getBitmap()
+            let result = plugin.detect(bitmap)
+            this.process(context, result)
+            this.status = "pending"
         }
-        this.status = "processing"
-        let capture = captureScreen()
-        let bitmap = capture.getBitmap()
-        let result = plugin.detect(bitmap)
-        this.process(context, result)
-        this.status = "pending"
+        return false
     }
 }
 exports.detector = new ScreenDetector()
