@@ -1,10 +1,14 @@
 const Storategy = function(properties) {
     Object.assign(this, properties || {
         name: undefined,
-        storategy: undefined
+        storategies: undefined
     }),
     this.fightStorategy = function(level) {
-        
+        let storategy = this.storategis[level]
+        if (storategy == undefined) {
+            return null
+        }
+        return storategy
     }
 }
 exports.createStorategy = (properties) => {
