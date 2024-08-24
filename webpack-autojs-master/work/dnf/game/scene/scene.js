@@ -4,7 +4,9 @@ const Scene = function(properties) {
         specialRoute: undefined
     }),
     this.checkCurrentRoom = function() {},
-    this.findSpecialRoute = function(level, objects) {}
+    this.findSpecialRoute = function(level, objects) {
+        if (f)
+    }
 }
 
 exports.createScene = (properties) => {
