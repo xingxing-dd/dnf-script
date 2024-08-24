@@ -1,6 +1,5 @@
 var socket = require("../common/socket")
 var assistant = require("./assistant")
-var enter = require("./action/enter")
 
 /**
  * 标记当前状态

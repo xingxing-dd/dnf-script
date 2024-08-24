@@ -1,7 +1,6 @@
 exports.display = () => {
     var utils = require("../common/utils")
     var socket = require("../common/socket")
-    var global = require("../common/global")
     var game = require("../game/game")
     var { detector } = require("../game/action/detector")
     var { matcher } = require("../game/action/matcher")
