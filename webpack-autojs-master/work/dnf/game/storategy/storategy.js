@@ -1,6 +1,12 @@
-const Storategy = function(name) {
-    this.name = name,
-    this.fight = function(context) {
+const Storategy = function(properties) {
+    Object.assign(this, properties || {
+        name: undefined,
+        storategy: undefined
+    }),
+    this.fightStorategy = function(level) {
         
     }
+}
+exports.createStorategy = (properties) => {
+    return new Storategy(properties)
 }
