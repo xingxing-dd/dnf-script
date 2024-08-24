@@ -36,7 +36,7 @@ const Coward = function(properties) {
     this.init = function() {
         let keyboard = acquire("keyboard")
         if(!keyboard) {
-            toast("未初始化键位，不可使用脚本！")
+            toast("未初始化键位，不可使用脚本，请退出脚本重新初始化！")
             return
         }
         for (let name in this.skills) {
