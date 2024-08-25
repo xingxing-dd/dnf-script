@@ -9,14 +9,15 @@ const Debuger = function() {
             return
         }
         for (let index = 0; index < this.boxs.length; index ++) {
+            let box = this.boxs[index]
             canvas.drawRect(
-                this.boxs[index].x, 
-                this.boxs[index].y, 
-                this.boxs[index].x + this.boxs[index].w, 
-                this.boxs[index].y + this.boxs[index].h, 
+                box.x, 
+                box.y, 
+                box.x + box.w, 
+                box.y + box.h, 
                 this.boxFont
             );
-            canvas.drawText(this.boxs[index].label, this.boxs[index].x, this.boxs[index].y - 10, this.textFont);
+            canvas.drawText(box.label, box.x, box.y - 10, this.textFont);
         }
     }
     this.init = function() {

@@ -52,6 +52,7 @@ const Coward = function(properties) {
             return
         }
         //移动指令
+        press(this.bounds.x, this.bounds.y, target.distince)
     },
     this.fight = function(fightQueue) {
         if (!fightQueue || fightQueue.length == 0) {

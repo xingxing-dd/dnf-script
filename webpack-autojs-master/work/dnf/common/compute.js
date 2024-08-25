@@ -1,21 +1,18 @@
-const { plugin } = require("../../common/utils")
-const { debuger } = require("../../common/debuger")
-const ScreenDetector = function() {
-    this.status = "pending",
-    this.bottomCenter = function(box) {
+exports.compute = {
+    bottomCenter: function(bounds) {
         return {
-            x: box.x + box.w / 2,
-            y: box.y + box.h / 2
+            x: bounds.x + bounds.w / 2,
+            y: bounds.y + bounds.h
         }
     },
-    this.angleCalcul = function(source, target) {
+    angleCalcul: function(source, target) {
         const dx = target.x - source.x    
         const dy = target.y - source.y    
         const radAngle = Math.atan2(dy, dx)  
         const degAngle = radAngle * (180 / Math.PI)
         return ((degAngle + 360) % 360) 
     },
-    this.distanceCalcul = function(source, targets) {
+    distanceCalcul: function(source, targets) {
         let distances = []
         let sourceCenter = this.bottomCenter(source)
         for (let target of targets) {
@@ -29,7 +26,7 @@ const ScreenDetector = function() {
         }
         return distances 
     },
-    this.suitableTarget = function(targets) {
+    suitableTarget: function(targets) {
         if (!targets || targets.length == 0) {
             return null
         }
@@ -45,7 +42,7 @@ const ScreenDetector = function() {
         }
         return maxProbItem;
     },
-    this.findClosest = function(source, targets) {
+    findClosest: function(source, targets) {
         if (!source || !targets) {
             return
         }
@@ -63,7 +60,7 @@ const ScreenDetector = function() {
         }
         return closestResult
     },
-    this.findFarthest = function(source, targets) {
+    findFarthest: function(source, targets) {
         if (!source || !targets) {
             return
         }
@@ -80,49 +77,5 @@ const ScreenDetector = function() {
             farthestResult["p2"] = d.targetCenter
         }
         return farthestResult
-    },
-    this.suitableDoor = function(coward, guidance, doors) {
-        if (!coward || !guidance) {
-            return null
-        }
-        let result = this.findClosest(guidance, doors)
-        if (!result || result.distance > 100) {
-            return null
-        }
-        return this.findClosest(coward, [result.target])
-    },
-    this.process = function(context, result) {
-        context["objects"] = result
-        // let coward = this.suitableTarget(result["coward"])
-        // let monster = this.findClosest(coward, result["monster"])
-        // let reward = this.findClosest(coward, result["reward"])
-        // let guidance = this.findFarthest(coward, result["guidance"])
-        // let door = this.suitableDoor(coward, guidance, result["door"])
-        // context["objects"] = {
-        //     coward: coward,
-        //     rocker: {},
-        //     skills: {},
-        //     monster: monster,
-        //     reward: reward,
-        //     door: door,
-        //     guidance: guidance
-        // }
-    },
-    this.detect = function(context, callback) {
-        if (this.status == 'pending') {
-            this.status = "processing"
-            let capture = captureScreen()
-            let bitmap = capture.getBitmap()
-            let result = plugin.detect(bitmap, 0.8)
-            //this.process(context, result)
-            debuger.refresh()
-            for (let box of result) {
-                debuger.add(box)
-            }
-            console.info(JSON.stringify(result))
-            this.status = "pending"
-        }
-        return false
     }
 }
-exports.detector = new ScreenDetector()

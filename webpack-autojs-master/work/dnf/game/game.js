@@ -4,7 +4,6 @@ var assistant = require("./assistant")
 /**
  * 标记当前状态
  */
-var action = enter.create()
 var processing = false
 var waitTimes = 0
 var debugWindow

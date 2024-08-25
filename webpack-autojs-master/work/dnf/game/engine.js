@@ -32,8 +32,8 @@ const ScriptEngine = function() {
         if (!this.pipelines[flowId]) {
             return
         }
-        this.pipelines[flowId]["before"] = before
-        this.pipelines[flowId]["after"] = after
+        this.pipelines[flowId]["before"] = before || (() => console.log("任务开始:" + flowId))
+        this.pipelines[flowId]["after"] = after || (() => console.log("任务结束:" + flowId))
         this.pipelines[flowId]["status"] = "pending"
     },
     this.submit = function(flowId, name, execute, delay, depend, sync) {

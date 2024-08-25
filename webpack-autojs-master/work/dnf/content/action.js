@@ -7,6 +7,7 @@ exports.display = () => {
     var { ocr } = require("../game/action/ocr")
     var { engine }   = require("../game/engine")
     var { cache } = require("../common/utils")
+    const { plugin } = require("../common/utils")
     const keyboard = require("../game/pipeline/keyboard")
     var autoCloseTimer = null
     var executionStatus = false
@@ -108,7 +109,15 @@ exports.display = () => {
                     // engine.submit("111", "match21", (context) => ocr.detect(context, "111", "星仔的修罗", (context, data) => { }), "match20", 1000)
                     // engine.start()
                     requestScreenCapture(true)
-                    keyboard.init()
+                    engine.submit("111", "detect", (context) => detector.detect(context), 200)
+                    engine.comfirm("111")
+                    engine.start()
+                    // let capture = captureScreen()
+                    // let bitmap = capture.getBitmap()
+                    // let result = plugin.detect(bitmap, 0.8)
+                    // console.info(JSON.stringify(result))
+                    // requestScreenCapture(true)
+                    // keyboard.init()
                 } else {
                     //game.stop()
                     engine.pause()

@@ -1,7 +1,7 @@
 exports.template = {
     "common/rocker": {
         label: "操作杆",
-        bounds: [0, 0.3, 0.4, 1]
+        bounds: [0, 0.3, 0.6, 1]
     },
     "role/berserker/1": {
         label: "普通攻击",
@@ -37,18 +37,18 @@ exports.template = {
     },
     "role/berserker/9": {
         label: "暴走",
-        bounds: [0.2, 0.6, 0.8, 1]
+        bounds: [0.6, 1, 0.4, 0.7]
     },
     "role/berserker/10": {
         label: "愤怒",
-        bounds: [0.2, 0.6, 0.8, 1]
+        bounds: [0.6, 1, 0.4, 0.7]
     },
     "role/berserker/11": {
         label: "崩山裂地",
-        bounds: [0.2, 0.6, 0.8, 1]
+        bounds: [0.6, 1, 0.4, 0.7]
     },
     "role/berserker/12": {
         label: "暗狱魔刹",
-        bounds: [0.2, 0.6, 0.8, 1]
+        bounds: [0.6, 1, 0.4, 0.7]
     } 
 }
