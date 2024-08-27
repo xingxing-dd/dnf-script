@@ -121,11 +121,12 @@ exports.init = () => {
     //remove()
     let keyboard = acquire("keyboard")
     if (keyboard && keyboard["rocker"]) {
-        return
+        return true
     } 
     if(!confirm("当前键位未初始化，请前往【地下修炼场】")) {
         toast("未初始化键位，不可使用脚本！")
-        return
+        return false
     }
     submit()
+    return false
 }

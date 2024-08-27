@@ -115,10 +115,10 @@ const ScreenDetector = function() {
             let bitmap = capture.getBitmap()
             let result = plugin.detect(bitmap, 0.8)
             //this.process(context, result)
-            debuger.refresh()
-            for (let box of result) {
-                debuger.add(box)
-            }
+            // debuger.refresh()
+            // for (let box of result) {
+            //     debuger.add(box)
+            // }
             let objects = {}
             for (let obj of result) {
                 if (objects[obj.label] == undefined) {
@@ -127,6 +127,9 @@ const ScreenDetector = function() {
                 objects[obj.label].push(obj)
             }
             context["objects"] = objects
+            if (!objects["monster"] && !objects["reward"] && !objects["guidance"]) {
+                objects["repeat"] = [plugin.match(bitmap, "common/repeat", [0.6, 1, 0, 0.4])]
+            }
             this.status = "pending"
         }
         return false

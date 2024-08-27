@@ -1,5 +1,6 @@
-const { findClosest, suitableTarget } = require("../../common/compute")
+const { findClosest, findFarthest, suitableTarget } = require("../../common/compute")
 const { debuger } = require("../../common/debuger")
+const { plugin } = require("../../common/utils")
 const Processor = function(properties) {
     Object.assign(this, properties || {
         dungeons: undefined,
@@ -15,13 +16,14 @@ const Processor = function(properties) {
             this.coward.refresh(suitableTarget(coward))
         }
     },
-    this.figth = function(monsters) {
+    this.figth = function(level, monsters) {
+        console.info(JSON.stringify(monsters))
         if (!monsters || monsters.length == 0) {
             return false
         }
         let closest = findClosest(this.coward.bounds, monsters)
-        console.info("最近的怪物：" + JSON.stringify(closest))
-        //this.coward.fight(closest)
+        this.coward.move(closest)
+        this.coward.fight([{code:"1"}, {code:"1"}])
     },
     this.pickup = function(rewards) {
         if (!rewards || rewards.length == 0) {
@@ -31,15 +33,18 @@ const Processor = function(properties) {
         console.info("最近的奖励：" + JSON.stringify(closest))
         this.coward.move(closest)
     },
-    this.next = function(level, guidances) {
+    this.next = function(level, objects) {
         let guidance = this.dungeons.specialRoute(level)
-        if (!guidance) {
-            guidance = guidances[0]
+        console.info("11" + JSON.stringify(guidance) + "," + JSON.stringify(objects))
+        if (!guidance && objects && objects["guidance"]) {
+            guidance = findFarthest(this.coward.bounds, objects["guidance"])
         }
-        if (!guidance) {
-            guidance = this.dungeons.defaultRoute(level)
-        }
+        console.info("1221" + JSON.stringify(guidance))
+        // if (!guidance) {
+        //     guidance = this.dungeons.defaultRoute(level)
+        // }   
         this.coward.move(guidance)
+        this.temp["corrected"] = false
     },
     this.correction = function() {
         if (this.temp["corrected"]) {
@@ -59,9 +64,9 @@ const Processor = function(properties) {
                 }
                 this.refresh(objects["coward"])
                 //如果出现怪物或者掉落材料，那么将矫正标识标记为需要矫正
-                if (objects["monster"] || objects["monster"]) {
-                    this.temp["corrected"] = false
-                }
+                // if (objects["monster"] && !this.temp["corrected"]) {
+                //     this.correction()
+                // }
                 let level = this.temp["level"] || 1
                 //有怪物攻击怪物
                 if(this.figth(level, objects["monster"])) {
@@ -71,10 +76,13 @@ const Processor = function(properties) {
                 if (this.pickup(objects["reward"])) {
                     return fasle
                 }
-                // //检测矫正房间号等信息，防止误判
-                // this.correction()
-                // //移动到下一张地图
-                // this.next(level, objects)
+                //检测矫正房间号等信息，防止误判
+                console.info("当前关卡:" + level)
+                this.next(level, objects)
+                if (objects["repeat"]) {
+                    
+                    click(objects["repeat"][0].x + 10, objects["repeat"][0].y + 10)
+                }
             } catch (e) {
                 console.error("执行异常" + e)
             } finally {

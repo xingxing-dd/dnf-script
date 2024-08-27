@@ -61,6 +61,7 @@ const findClosest = function(source, targets) {
     return closestResult
 }
 const findFarthest = function(source, targets) {
+    console.info(JSON.stringify(source) + "," + JSON.stringify(targets))
     if (!source || !targets) {
         return
     }

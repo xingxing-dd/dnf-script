@@ -14,37 +14,41 @@ const Skill = function(properties) {
         if (current < this.next) {
             return
         }
+        console.info("释放技能:" + this.label + "," + this.press)
         this.next = current + this.cooling
         if (this.press == undefined || this.press == 0) {
-            click(this.bounds.x + this.bounds.w / 2, this.bounds.y + this.bounds.h / 2)
+            click(Math.floor(this.bounds.x + this.bounds.w / 2), Math.floor(this.bounds.y + this.bounds.h / 2))
         } else {
-            press(this.bounds.x + this.bounds.w / 2, this.bounds.y + this.bounds.h / 2, press)
+            press(Math.floor(this.bounds.x + this.bounds.w / 2), Math.floor(this.bounds.y + this.bounds.h / 2), this.press)
         }
         if (this.cast == undefined || this.cast == 0) {
             return
         }
+        console.info("释放技能:" + this.label + "," + this.cast)
         sleep(this.cast)
     }
 }
-const Coward = function(properties) {
-    Object.assign(this, properties || {
+const Coward = function() {
+    Object.assign(this, {
         start: Date.now(),
         bounds: {},
         rocker: {},
         skills: {},
-        speed: 0.5,
+        speed: 1,
     }),
-    this.init = function() {
+    this.init = function(properties) {
         let keyboard = acquire("keyboard")
         if(!keyboard) {
             toast("未初始化键位，不可使用脚本，请退出脚本重新初始化！")
             return
         }
-        for (let name in this.skills) {
+        for (let name in properties.skills) {
             if (keyboard[name] == undefined) {
                 continue
             }
-            this.skills[name].bounds = keyboard[name]
+            let skill = new Skill(properties.skills[name])
+            skill.bounds = keyboard[name]
+            this.skills[name] = skill
         }
         this.rocker = keyboard["rocker"]
     },
@@ -52,11 +56,9 @@ const Coward = function(properties) {
         if (this.rocker == undefined || target == null) {
             return
         }
-        console.info("开始执行移动计算")
         let o = rockerCoordinate(this.rocker, target.angle)
         //移动指令
-        console.info("开始执行移动代码" + target.distance + "," + JSON.stringify(o))
-        press(o.x, o.y, Math.round(target.distance))
+        press(o.x, o.y, Math.round(target.distance / this.speed))
     },
     this.fight = function(fightQueue) {
         if (!fightQueue || fightQueue.length == 0) {
@@ -81,7 +83,7 @@ const Coward = function(properties) {
     }
 }
 exports.createCoward = (properties) => {
-    let coward = new Coward(properties)
-    coward.init()
+    let coward = new Coward()
+    coward.init(properties)
     return coward
 }

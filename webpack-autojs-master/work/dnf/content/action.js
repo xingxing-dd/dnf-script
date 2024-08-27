@@ -12,6 +12,7 @@ exports.display = () => {
     const keyboard = require("../game/pipeline/keyboard")
     const { createCoward } = require("../game/object/coward")
     const { debuger } = require("../common/debuger")
+    const { createDungeons } = require("../game/scene/dungeons")
     var autoCloseTimer = null
     var executionStatus = false
     var w = floaty.rawWindow(
@@ -49,6 +50,31 @@ exports.display = () => {
             ext_menus_hide()
         }
     })
+    let bwj = createDungeons({
+        name: "布万家修炼场",
+        map: {
+            template: "dungeons/buwanjia/map",
+            region: [0.3, 0.7, 0.3, 0.7],
+            row: 3,
+            col: 6
+        },
+        routes: {
+
+
+
+
+
+
+
+
+
+
+
+
+        }
+    })
+    
+    let coward
     w.execution.click(() => {
         utils.async(
             () => {},
@@ -112,27 +138,113 @@ exports.display = () => {
                     // engine.submit("111", "match21", (context) => ocr.detect(context, "111", "星仔的修罗", (context, data) => { }), "match20", 1000)
                     // engine.start()
                     requestScreenCapture(true)
-                    let capture = captureScreen()
-                    let bitmap = capture.getBitmap()
-                    let result = plugin.match(bitmap, "dungeons/buwanjia/map", [0.4, 0.8, 0.3, 0.7])
-                    debuger.add(result)
-                    console.info(JSON.stringify(result))
-                    result = plugin.match(bitmap, "common/position", [0.3, 0.7, 0.3, 0.7])
-                    console.info(JSON.stringify(result))
-                    debuger.add(result)
-                    // engine.submit("111", "detect", (context) => detector.detect(context), 200)
-                    // let processor = createProcessor({
-                    //     coward: createCoward()
-                    // })
-                    // engine.submit("111", "process", (context) => processor.process(context), 300, null)
-                    // engine.comfirm("111")
-                    // engine.start()
+                    // let index = bwj.acquireLevel()
+                    // console.info("得到房间号：" + index)
+                    // let capture = captureScreen()
+                    // let bitmap = capture.getBitmap()
+                    // let result = plugin.match(bitmap, "dungeons/buwanjia/map", [0.4, 0.8, 0.3, 0.7])
+                    // debuger.add(result)
+                    // console.info(JSON.stringify(result))
+                    // result = plugin.match(bitmap, "common/position", [0.3, 0.7, 0.3, 0.7])
+                    // console.info(JSON.stringify(result))
+                    // debuger.add(result)
+                    let result = keyboard.init()
+                    if (!result) {
+                        toast("稍后重新启动！")
+                        return 
+                    }
+                    coward = createCoward({
+                        skills: {
+                            "1": {
+                                label: "普通攻击",
+                                cooling: 0,
+                                press: 600,
+                                cast: 50
+                            },
+                            "2": {
+                                label: "十字斩",
+                                cooling: 4000,
+                                press: 50,
+                                cast: 100
+                            },
+                            "3": {
+                                label: "崩山击",
+                                cooling: 5000,
+                                press: 0,  
+                                cast: 300
+                            },
+                            "4": {
+                                label: "愤怒狂刃",
+                                cooling: 20000,
+                                press: 0,
+                                cast: 1000
+                            },
+                            "5": {
+                                label: "捕梦之手",
+                                cooling: 9100,
+                                press: 0,
+                                cast: 200
+                            },
+                            "6": {
+                                label: "怒气爆发",
+                                cooling: 20000,
+                                press: 0,
+                                cast: 200
+                            },
+                            "7": {
+                                label: "绝念除尘击",
+                                cooling: 20000,
+                                press: 5000,
+                                cast: 600
+                            },
+                            "8": {
+                                label: "爆发之刃",
+                                cooling: 20000,
+                                press: 0,
+                                cast: 400
+                            },
+                            "9": {
+                                label: "暴走",
+                                cooling: 5000,
+                                press: 0,
+                                cast: 50
+                            },
+                            "10": {
+                                label: "愤怒",
+                                cooling: 60000,
+                                press: 300,
+                                cast: 50
+                            },
+                            "11": {
+                                label: "崩山裂地",
+                                cooling: 40000,
+                                press: 0,
+                                cast: 600
+                            },
+                            "12": {
+                                label: "暗狱魔刹",
+                                cooling: 145000,
+                                press: 0,
+                                cast: 200
+                            }
+                        }
+                    })
+                    engine.submit("111", "detect", (context) => detector.detect(context), 200)
+                    let processor = createProcessor({
+                        coward: coward,
+                        dungeons: bwj
+                    })
+                    engine.submit("111", "process", (context) => processor.process(context), 300, null)
+                    engine.comfirm("111")
+                    engine.start()
+                    
+                    //coward.fight([{code:"1"}, {code:"1"}])
                     // let capture = captureScreen()
                     // let bitmap = capture.getBitmap()
                     // let result = plugin.detect(bitmap, 0.8)
                     // console.info(JSON.stringify(result))
                     // requestScreenCapture(true)
-                    // keyboard.init()
+                    
                 } else {
                     //game.stop()
                     engine.pause()
