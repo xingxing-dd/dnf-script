@@ -23,12 +23,22 @@ const ScreenMatcher = function() {
             return true
         }
         let capture = captureScreen()
+        if (!capture) {
+            return false
+        }
         let bitmap = capture.getBitmap()
+        if (!bitmap) {
+            return false
+        }
         console.info("开始识别：" + JSON.stringify(templateConfig) + "," + target)
         let result = plugin.match(bitmap, target, templateConfig["bounds"])
         console.info("识别结果：" + JSON.stringify(result))
         if (result != null) {
+            debuger.refresh()
             debuger.add(result)
+        }
+        if(callback) {  
+            callback(context, result)
         }
         this.status = "pending"
         return result != null

@@ -10,6 +10,9 @@ const Debuger = function() {
         }
         for (let index = 0; index < this.boxs.length; index ++) {
             let box = this.boxs[index]
+            if (box == undefined) {
+                continue
+            }
             canvas.drawRect(
                 box.x, 
                 box.y, 

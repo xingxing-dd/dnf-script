@@ -10,6 +10,6 @@ const Dungeons = function(properties) {
     this.specialRoute = function(level, objects) {}
 }
 
-exports.createScene = (properties) => {
+exports.createDungeons = (properties) => {
     return new Dungeons(properties)
 }

@@ -49,10 +49,10 @@ const ScriptEngine = function() {
         if (this.pipelines[flowId]["executors"][name]) {
             return
         }
-        if (depend == undefined) {
-            let executorKeys = Object.keys(this.pipelines[flowId]["executors"])
-            depend= !executorKeys || executorKeys.length == 0 ? undefined : executorKeys[executorKeys.length - 1]
-        }
+        // if (depend == undefined) {
+        //     let executorKeys = Object.keys(this.pipelines[flowId]["executors"])
+        //     depend= !executorKeys || executorKeys.length == 0 ? undefined : executorKeys[executorKeys.length - 1]
+        // }
         this.pipelines[flowId]["executors"][name] = new ScriptExecutor(execute, delay, depend, sync)
     },
     this.remove = function(flowId, name) {
@@ -103,6 +103,14 @@ const ScriptEngine = function() {
         }
         return true
     },
+    this.switch = function() {
+        if (this.status == "running") {
+            this.status = "pause"
+        } else {
+            this.status = "running"
+        }
+        return this.status == "running"
+    }
     this.start = function() {
         this.status = "running"
     },

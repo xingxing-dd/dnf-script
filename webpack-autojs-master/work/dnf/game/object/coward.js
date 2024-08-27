@@ -1,4 +1,5 @@
 const { remove, acquire, cache } = require("../../common/utils")
+const { rockerCoordinate } = require("../../common/compute")
 const Skill = function(properties) {
     Object.assign(this, properties || {
         label: undefined,
@@ -48,11 +49,14 @@ const Coward = function(properties) {
         this.rocker = keyboard["rocker"]
     },
     this.move = function(target) {
-        if (this.bounds.x == undefined || this.rocker == undefined || target == null) {
+        if (this.rocker == undefined || target == null) {
             return
         }
+        console.info("开始执行移动计算")
+        let o = rockerCoordinate(this.rocker, target.angle)
         //移动指令
-        press(this.bounds.x, this.bounds.y, target.distince)
+        console.info("开始执行移动代码" + target.distance + "," + JSON.stringify(o))
+        press(o.x, o.y, Math.round(target.distance))
     },
     this.fight = function(fightQueue) {
         if (!fightQueue || fightQueue.length == 0) {

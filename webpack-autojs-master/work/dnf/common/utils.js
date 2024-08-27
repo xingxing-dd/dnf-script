@@ -1,4 +1,5 @@
 var config = require("./config").config()
+const storage = storages.create("dnf-server");
 exports.loadView = (view) => {
     const module = require("../view/" + view)
     ui.setContentView(module.view())
@@ -59,14 +60,12 @@ exports.async = (before, task, after, delay) => {
     });
 }
 exports.cache = (key, value, noSerialization) => {
-    let storage = storages.create("dnf-server");
     if (!noSerialization) {
         value = JSON.stringify(value)
     }
     storage.put(key, value)
 }
 exports.acquire = (key, noSerialization) => {
-    let storage = storages.create("dnf-server");
     let value = storage.get(key)
     if (value && !noSerialization) {
         value = JSON.parse(value)

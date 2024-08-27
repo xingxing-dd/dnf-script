@@ -119,7 +119,14 @@ const ScreenDetector = function() {
             for (let box of result) {
                 debuger.add(box)
             }
-            console.info(JSON.stringify(result))
+            let objects = {}
+            for (let obj of result) {
+                if (objects[obj.label] == undefined) {
+                    objects[obj.label] = []
+                }
+                objects[obj.label].push(obj)
+            }
+            context["objects"] = objects
             this.status = "pending"
         }
         return false
