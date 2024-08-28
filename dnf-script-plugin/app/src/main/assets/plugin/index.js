@@ -5,7 +5,7 @@ module.exports = function (plugin) {
     function DnfScriptPlugin() {
     }
 
-    DnfScriptPlugin.detect = (source) => plugin.detect(source)
+    DnfScriptPlugin.detect = (source, ratioThreshold) => plugin.detect(source, ratioThreshold)
 
     DnfScriptPlugin.match = (source, template, bounds) => plugin.match(source, template, bounds)
 

@@ -38,5 +38,6 @@ dependencies {
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
     implementation libs.auto.js.plugin.sdk
+    implementation libs.gson
     implementation(fileTree("libs"))
 }
