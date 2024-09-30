@@ -13,6 +13,8 @@ exports.display = () => {
     const { createCoward } = require("../game/object/coward")
     const { debuger } = require("../common/debuger")
     const { createDungeons } = require("../game/scene/dungeons")
+    const { match, debug } = require("../game/test")
+    const { scheduler } = require("../game/core/scheduler")
     var autoCloseTimer = null
     var executionStatus = false
     var w = floaty.rawWindow(
@@ -20,6 +22,7 @@ exports.display = () => {
             <img id="action_bar" w="38sp" h="38sp" padding="5sp" bg="#CCCCCC" src="file://./img/分类.png" alpha="0.5" radius="15sp"/>
             <horizontal id="ext_menus" visibility="gone" bg="#CCCCCC" alpha="0.8">
                 <img id="execution" w="38sp" h="38sp" padding="5sp"  src="file://./img/播放.png" radius="15sp"/>
+                <img id="setting" w="38sp" h="38sp" padding="5sp"  src="file://./img/设置.png" radius="15sp"/>
                 <img id="home" w="38sp" h="38sp" padding="5sp" src="file://./img/首页.png" radius="15sp"/>
                 <img id="exit" w="38sp" h="38sp" padding="5sp" src="file://./img/退出.png" radius="15sp"/>
             </horizontal>
@@ -74,11 +77,87 @@ exports.display = () => {
         }
     })
     
-    let coward
-    w.execution.click(() => {
+    let coward = createCoward({
+        skills: {
+            "1": {
+                label: "普通攻击",
+                cooling: 0,
+                press: 600,
+                cast: 50
+            },
+            "2": {
+                label: "十字斩",
+                cooling: 4000,
+                press: 50,
+                cast: 200
+            },
+            "3": {
+                label: "崩山击",
+                cooling: 5000,
+                press: 0,  
+                cast: 500
+            },
+            "4": {
+                label: "愤怒狂刃",
+                cooling: 20000,
+                press: 0,
+                cast: 1000
+            },
+            "5": {
+                label: "捕梦之手",
+                cooling: 9100,
+                press: 0,
+                cast: 200
+            },
+            "6": {
+                label: "怒气爆发",
+                cooling: 20000,
+                press: 0,
+                cast: 200
+            },
+            "7": {
+                label: "绝念除尘击",
+                cooling: 20000,
+                press: 5000,
+                cast: 600
+            },
+            "8": {
+                label: "爆发之刃",
+                cooling: 20000,
+                press: 0,
+                cast: 400
+            },
+            "9": {
+                label: "暴走",
+                cooling: 5000,
+                press: 0,
+                cast: 50
+            },
+            "10": {
+                label: "愤怒",
+                cooling: 60000,
+                press: 300,
+                cast: 50
+            },
+            "11": {
+                label: "崩山裂地",
+                cooling: 40000,
+                press: 0,
+                cast: 600
+            },
+            "12": {
+                label: "暗狱魔刹",
+                cooling: 145000,
+                press: 0,
+                cast: 200
+            }
+        }
+    })
+    w.execution.click(() => { 
         utils.async(
             () => {},
             () => {
+                scheduler.switch()
                 if (!executionStatus) {
                     //socket.connect()
                     executionStatus = true
@@ -137,7 +216,6 @@ exports.display = () => {
                     // engine.submit("111", "match20", (context) => ocr.detect(context, "111", "且吃我一脚", (context, data) => { }), "match19", 1000)
                     // engine.submit("111", "match21", (context) => ocr.detect(context, "111", "星仔的修罗", (context, data) => { }), "match20", 1000)
                     // engine.start()
-                    requestScreenCapture(true)
                     // let index = bwj.acquireLevel()
                     // console.info("得到房间号：" + index)
                     // let capture = captureScreen()
@@ -148,116 +226,52 @@ exports.display = () => {
                     // result = plugin.match(bitmap, "common/position", [0.3, 0.7, 0.3, 0.7])
                     // console.info(JSON.stringify(result))
                     // debuger.add(result)
-                    let result = keyboard.init()
-                    if (!result) {
-                        toast("稍后重新启动！")
-                        return 
-                    }
-                    coward = createCoward({
-                        skills: {
-                            "1": {
-                                label: "普通攻击",
-                                cooling: 0,
-                                press: 600,
-                                cast: 50
-                            },
-                            "2": {
-                                label: "十字斩",
-                                cooling: 4000,
-                                press: 50,
-                                cast: 100
-                            },
-                            "3": {
-                                label: "崩山击",
-                                cooling: 5000,
-                                press: 0,  
-                                cast: 300
-                            },
-                            "4": {
-                                label: "愤怒狂刃",
-                                cooling: 20000,
-                                press: 0,
-                                cast: 1000
-                            },
-                            "5": {
-                                label: "捕梦之手",
-                                cooling: 9100,
-                                press: 0,
-                                cast: 200
-                            },
-                            "6": {
-                                label: "怒气爆发",
-                                cooling: 20000,
-                                press: 0,
-                                cast: 200
-                            },
-                            "7": {
-                                label: "绝念除尘击",
-                                cooling: 20000,
-                                press: 5000,
-                                cast: 600
-                            },
-                            "8": {
-                                label: "爆发之刃",
-                                cooling: 20000,
-                                press: 0,
-                                cast: 400
-                            },
-                            "9": {
-                                label: "暴走",
-                                cooling: 5000,
-                                press: 0,
-                                cast: 50
-                            },
-                            "10": {
-                                label: "愤怒",
-                                cooling: 60000,
-                                press: 300,
-                                cast: 50
-                            },
-                            "11": {
-                                label: "崩山裂地",
-                                cooling: 40000,
-                                press: 0,
-                                cast: 600
-                            },
-                            "12": {
-                                label: "暗狱魔刹",
-                                cooling: 145000,
-                                press: 0,
-                                cast: 200
-                            }
-                        }
-                    })
-                    engine.submit("111", "detect", (context) => detector.detect(context), 200)
-                    let processor = createProcessor({
-                        coward: coward,
-                        dungeons: bwj
-                    })
-                    engine.submit("111", "process", (context) => processor.process(context), 300, null)
-                    engine.comfirm("111")
-                    engine.start()
-                    
+                    // engine.submit("111", "detect", (context) => detector.detect(context), 200)
+                    // let processor = createProcessor({
+                    //     coward: coward,
+                    //     dungeons: bwj
+                    // })
+                    // engine.submit("111", "process", (context) => processor.process(context), 300, null)
+                    // engine.comfirm("111")
+                    // engine.start()
+                    // engine.submit("test11", [
+                    //     {
+                    //         name: "测试任务1",
+                    //         execute: () => console.info("执行"),
+                    //         interval: 1000,
+                    //         retry: 10,
+                    //         before: () => console.info("前置动作"),
+                    //         after: () => console.info("后置动作")
+                    //     }
+                    // ])
+                    // engine.start()
                     //coward.fight([{code:"1"}, {code:"1"}])
-                    // let capture = captureScreen()
-                    // let bitmap = capture.getBitmap()
-                    // let result = plugin.detect(bitmap, 0.8)
-                    // console.info(JSON.stringify(result))
-                    // requestScreenCapture(true)
                     
                 } else {
                     //game.stop()
-                    engine.pause()
-                    executionStatus = false
+                    // engine.pause()
+                    // executionStatus = false
                 }
             },
             () => {
-                if (executionStatus) {
+                if (engine.switch()) {
                     w.execution.attr("src", "file://./img/播放中.png")
                 } else {
                     w.execution.attr("src", "file://./img/播放.png")
                 }},
             200
+        )
+    })
+    w.setting.click(() => {
+        utils.async(
+            () => {},
+            () => {
+                // requestScreenCapture(true)
+                //keyboard.init()
+                //debug()
+                match()
+            },
+            () => {}
         )
     })
     w.home.click(() => {

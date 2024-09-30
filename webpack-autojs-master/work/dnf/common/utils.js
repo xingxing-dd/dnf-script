@@ -52,7 +52,6 @@ exports.async = (before, task, after, delay) => {
     threads.start(() => {
         ui.post(before)
         task()
-        console.info(delay)
         if (delay) {
             sleep(delay)
         }

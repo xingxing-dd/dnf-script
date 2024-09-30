@@ -6,9 +6,9 @@ exports.display = () => {
                 <text text="软蛋脚本V1.0" gravity="left" layout_weight="1"textSize="16sp" textColor="red"/>
                 <text id="exit" w="auto" text="退出" layout_gravity="right"/>
             </horizontal>
-            <appbar>
+            {/* <appbar>
                 <tabs id="tabs" textSize="14sp" bg="#000000"/>
-            </appbar>
+            </appbar> */}
             <viewpager id="viewpager">
                 <frame>
                     <relative id="content" gravity="center">
@@ -69,7 +69,7 @@ exports.display = () => {
     //设置滑动页面的标题
     w.viewpager.setTitles(["搬砖仔列表", "搬砖设置", "系统设置", "系统公告"]);
     //让滑动页面和标签栏联动
-    w.tabs.setupWithViewPager(w.viewpager);
+    //w.tabs.setupWithViewPager(w.viewpager);
     //w.setTouchable(false)
     // w.role_setting.setTextColor(colors.BLACK)
     let list = []

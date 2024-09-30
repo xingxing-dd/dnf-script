@@ -34,7 +34,6 @@ const ScreenMatcher = function() {
         let result = plugin.match(bitmap, target, templateConfig["bounds"])
         console.info("识别结果：" + JSON.stringify(result))
         if (result != null) {
-            debuger.refresh()
             debuger.add(result)
         }
         if(callback) {  

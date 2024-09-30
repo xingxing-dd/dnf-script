@@ -9,5 +9,7 @@ module.exports = function (plugin) {
 
     DnfScriptPlugin.match = (source, template, bounds) => plugin.match(source, template, bounds)
 
+    DnfScriptPlugin.blackScreenDetect = (source) => plugin.blackScreenDetect(source)
+
     return DnfScriptPlugin;
 }

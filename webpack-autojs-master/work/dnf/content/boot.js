@@ -33,16 +33,27 @@ exports.display = () => {
         </vertical>
     );
     w.setSize(-1, -1);
+    events.observeTouch();
+//注册触摸监听器
+events.onTouch(function(p){
+    //触摸事件发生时, 打印出触摸的点的坐标
+    log(p.x + ", " + p.y);
+});
     w.launch.click(() => {
         utils.async(
             () => w.launch.setText("启动服务中..."),
-            () => {},//utils.startServer(),
+            () => {
+                if (!requestScreenCapture(true)) {
+                    toast("未开启权限，不可使用脚本")
+                    return
+                }
+            },//utils.startServer(),
             () => utils.loadContent("action", w),
             500
         )
     })
     w.exit.click(() => {
-        w.close()
+        w.exitOnClose()
     })
     //ui.run(()=>{ w.requestFocus(); })
 }

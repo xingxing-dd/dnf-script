@@ -61,12 +61,13 @@ const findClosest = function(source, targets) {
     return closestResult
 }
 const findFarthest = function(source, targets) {
-    console.info(JSON.stringify(source) + "," + JSON.stringify(targets))
+    console.info("source:" + JSON.stringify(source) + ",target:" + JSON.stringify(targets))
     if (!source || !targets) {
         return
     }
     let farthestResult = {distance: 0}
     let distances = distanceCalcul(source, targets)
+    console.log("计算距离:" + JSON.stringify(distances))
     for (let d of distances) {
         if (farthestResult["distance"] > d.distance) {
             continue
@@ -80,6 +81,9 @@ const findFarthest = function(source, targets) {
     return farthestResult
 }
 const rockerCoordinate = function(rocker, angleInDegrees) {
+    if (!angleInDegrees) {
+        return null
+    }
     let centerX = rocker.x + Math.round(rocker.w / 2)
     let centerY = rocker.y + Math.round(rocker.h / 2)
     let random = 155 - Math.floor(Math.random() * 10)
@@ -92,9 +96,9 @@ const rockerCoordinate = function(rocker, angleInDegrees) {
     } else if (angleInDegrees == 270) {
         return {x: centerX, y: -random + centerY}
     }
-    console.info("执行1111111")
+    console.log("angleInDegrees:" + angleInDegrees)
     var angleInRadians = angleInDegrees * (Math.PI / 180);
-    console.info("执行2222222")
+    console.log("angleInRadians:" + angleInRadians)
     if ((angleInDegrees > 0 && angleInDegrees <= 45) || angleInDegrees >= 315) {
         return {x: random + centerX, y: random * Math.tan(angleInRadians) + centerY}
     } else if (angleInDegrees > 45 && angleInDegrees <= 135) {

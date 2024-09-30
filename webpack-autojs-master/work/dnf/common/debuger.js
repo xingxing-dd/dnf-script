@@ -1,13 +1,11 @@
 const Debuger = function() {
     this.window = undefined,
     this.boxs = [],
+    this.lines = [],
     this.boxFont = undefined,
     this.textFont = undefined,
     this.draw = function(canvas) {
         canvas.drawColor(0xFFFFFF, android.graphics.PorterDuff.Mode.CLEAR)
-        if (!this.boxs || this.boxs.length == 0) {
-            return
-        }
         for (let index = 0; index < this.boxs.length; index ++) {
             let box = this.boxs[index]
             if (box == undefined) {
@@ -21,6 +19,19 @@ const Debuger = function() {
                 this.boxFont
             );
             canvas.drawText(box.label, box.x, box.y - 10, this.textFont);
+        }
+        for (let index = 0; index < this.lines.length; index ++) {
+            let line = this.lines[index]
+            if (line == undefined) {
+                continue
+            }
+            canvas.drawLine(
+                line.x1, 
+                line.y1, 
+                line.x2, 
+                line.y2, 
+                this.boxFont
+            );
         }
     }
     this.init = function() {
@@ -54,6 +65,7 @@ const Debuger = function() {
             this.init()
         }
         this.boxs = boxs == undefined ? [] : boxs
+        this.lines = []
     },
     this.title = function(title) {
         if (!this.window) {
@@ -69,6 +81,15 @@ const Debuger = function() {
             return
         }
         this.boxs.push(box)
+    },
+    this.addLine = function(line) {
+        if (!this.window) {
+            this.init()
+        }
+        if (!line) {
+            return
+        }
+        this.lines.push(line)
     },
     this.close = function() {
         if (!this.window) {

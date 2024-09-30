@@ -2,7 +2,7 @@ const { findClosest, findFarthest, suitableTarget } = require("../../common/comp
 const { debuger } = require("../../common/debuger")
 const { plugin } = require("../../common/utils")
 const Processor = function(properties) {
-    Object.assign(this, properties || {
+    Object.assign(this, properties || {}, {
         dungeons: undefined,
         coward: undefined,
         strategy: undefined
@@ -23,7 +23,7 @@ const Processor = function(properties) {
         }
         let closest = findClosest(this.coward.bounds, monsters)
         this.coward.move(closest)
-        this.coward.fight([{code:"1"}, {code:"1"}])
+        this.coward.fight([{code:"1"},{code:"2"}, {code:"1"}])
     },
     this.pickup = function(rewards) {
         if (!rewards || rewards.length == 0) {
@@ -35,11 +35,16 @@ const Processor = function(properties) {
     },
     this.next = function(level, objects) {
         let guidance = this.dungeons.specialRoute(level)
-        console.info("11" + JSON.stringify(guidance) + "," + JSON.stringify(objects))
+        console.info("11" + JSON.stringify(guidance) + "," + JSON.stringify(this.coward))
         if (!guidance && objects && objects["guidance"]) {
             guidance = findFarthest(this.coward.bounds, objects["guidance"])
         }
-        console.info("1221" + JSON.stringify(guidance))
+        if (objects["door"] && guidance) {
+            let door = findClosest(guidance.target, objects["door"])
+            if (door.distance <= 100) {
+                guidance = findClosest(this.coward.bounds, [door.target])
+            }
+        }
         // if (!guidance) {
         //     guidance = this.dungeons.defaultRoute(level)
         // }   
@@ -82,6 +87,13 @@ const Processor = function(properties) {
                 if (objects["repeat"]) {
                     
                     click(objects["repeat"][0].x + 10, objects["repeat"][0].y + 10)
+                    sleep(500)
+                    let target = plugin.match(bitmap, "common/confirm", [0.3, 0.7, 0.3, 0.7])
+                    console.info("识别到确认按钮:" + JSON.stringify(target))
+                    if (target == undefined) {
+                        return false
+                    }
+                    click(target.x + 10, target.y + 10)
                 }
             } catch (e) {
                 console.error("执行异常" + e)
